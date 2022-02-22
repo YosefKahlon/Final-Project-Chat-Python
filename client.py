@@ -1,11 +1,11 @@
 # Python program to implement client side of chat room.
+
 import socket
 import threading
 import tkinter
 import tkinter.scrolledtext
 from tkinter import LEFT, simpledialog
 from turtle import left
-
 
 
 HOST = '127.0.0.1'
@@ -55,7 +55,7 @@ class Client:
         self.send_button.config(font=("Arial", 12))
         self.send_button.pack(side=LEFT,padx=5, pady=5)
 
-        self.list_button = tkinter.Button(self.win, text="list", command= self.write)
+        self.list_button = tkinter.Button(self.win, text="list", command= self.list)
         self.list_button.config(font=("Arial", 12))
         self.list_button.pack(side=LEFT,padx=20, pady=5)
 
@@ -68,6 +68,7 @@ class Client:
         self.win.mainloop()
 
     def write(self):
+      
         massege = f"{self.nickname}: {self.input_area.get('1.0' ,'end')}"
         self.sock.send(massege.encode('utf-8'))
         self.input_area.delete('1.0','end')

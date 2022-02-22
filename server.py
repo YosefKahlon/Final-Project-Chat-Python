@@ -23,9 +23,12 @@ def broacast(message):
 def handle(client):
     while True:
         try:
+            client.list=nickname
+            broacast(client.list)
             message= client.recv(1024)
             print(f"{nicknames[clients.index(client)]}")
             broacast(message)
+
         except:
             index =clients.index(client)
             clients.remove(client)
