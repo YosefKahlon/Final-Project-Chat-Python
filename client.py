@@ -3,7 +3,8 @@ import socket
 import threading
 import tkinter
 import tkinter.scrolledtext
-from tkinter import simpledialog
+from tkinter import LEFT, simpledialog
+from turtle import left
 
 
 
@@ -52,11 +53,13 @@ class Client:
 
         self.send_button = tkinter.Button(self.win, text="Send", command= self.write)
         self.send_button.config(font=("Arial", 12))
-        self.send_button.pack(padx=20, pady=5)
+        self.send_button.pack(side=LEFT,padx=5, pady=5)
 
         self.list_button = tkinter.Button(self.win, text="list", command= self.write)
         self.list_button.config(font=("Arial", 12))
-        self.list_button.pack(padx=20, pady=5)
+        self.list_button.pack(side=LEFT,padx=20, pady=5)
+
+       
         
 
         self.gui_done = True
@@ -69,6 +72,8 @@ class Client:
         self.sock.send(massege.encode('utf-8'))
         self.input_area.delete('1.0','end')
     
+    def list(self):
+        pass
     
     def stop(self):
         self.running = False
