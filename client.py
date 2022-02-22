@@ -54,6 +54,11 @@ class Client:
         self.send_button.config(font=("Arial", 12))
         self.send_button.pack(padx=20, pady=5)
 
+        self.list_button = tkinter.Button(self.win, text="list", command= self.write)
+        self.list_button.config(font=("Arial", 12))
+        self.list_button.pack(padx=20, pady=5)
+        
+
         self.gui_done = True
 
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
