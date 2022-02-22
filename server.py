@@ -23,8 +23,7 @@ def broacast(message):
 def handle(client):
     while True:
         try:
-            client.list=nickname
-            broacast(client.list)
+            
             message= client.recv(1024)
             print(f"{nicknames[clients.index(client)]}")
             broacast(message)
@@ -48,6 +47,7 @@ def receive():
 
         nicknames.append(nickname)
         clients.append(client)
+        
 
         print(f"Nickname of the client is {nickname}")
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
