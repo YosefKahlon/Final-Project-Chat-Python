@@ -74,9 +74,8 @@ class Client:
         self.input_area.delete('1.0','end')
     
     def list(self):
-        list_chat=self.sock.connect()
-        self.sock.send(list_chat.encode('utf-8'))
-        socket.on('connect', () => {console.log(socket.id, socket.io.engine.id, socket.json.id)})
+        
+        
         pass
     
     def stop(self):
