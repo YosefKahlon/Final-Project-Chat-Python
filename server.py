@@ -53,7 +53,7 @@ def receive():
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
         client.send("Connected to the server".encode('utf-8'))
 
-        thread = threading.Thread(target= handle,args=(client,))
+        thread = threading.Thread(target= handle,args=(client,address))
         thread.start()
 
 

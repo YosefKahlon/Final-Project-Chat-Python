@@ -74,9 +74,8 @@ class Client:
         self.input_area.delete('1.0','end')
     
     def list(self):
-        
-        
-        pass
+        massage= self.sock.recv(1024)
+        self.sock.send(massage.encode('utf-8'))
     
     def stop(self):
         self.running = False
