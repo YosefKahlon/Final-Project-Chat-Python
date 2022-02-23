@@ -13,7 +13,7 @@ PORT = 8070
 
 class Client:
     
-    def __init__(self,host ,port) :
+    def __init__(self,host ,port):
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host,port))
@@ -36,13 +36,13 @@ class Client:
         self.win = tkinter.Tk()
         self.win.configure( bg = "lightgray")
 
-        self.chat_label = tkinter.Label(self.win ,text= "Chat:", bg = "lightgray")
+        self.chat_label = tkinter.Label(self.win ,text="Chat:", bg = "lightgray")
         self.chat_label.config(font=("Arial", 12))
         self.chat_label.pack(padx=20, pady=5)
 
         self.text_area =tkinter.scrolledtext.ScrolledText(self.win)
-        self.text_area.pack(padx=20 ,pady= 5)
-        self.text_area.config(padx=20 ,pady= 5)
+        self.text_area.pack(padx=20, pady=5)
+        self.text_area.config(padx=20, pady=5)
 
         self.msg_label = tkinter.Label(self.win ,text= "Message:", bg = "lightgray")
         self.msg_label.config(font=("Arial", 12))
@@ -71,11 +71,11 @@ class Client:
       
         massege = f"{self.nickname}: {self.input_area.get('1.0' ,'end')}"
         self.sock.send(massege.encode('utf-8'))
-        self.input_area.delete('1.0','end')
+        self.input_area.delete('1.0', 'end')
     
     def list(self):
-        massage= self.sock.recv(1024)
-        self.sock.send(massage.encode('utf-8'))
+        pass
+        
     
     def stop(self):
         self.running = False

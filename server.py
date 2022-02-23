@@ -4,8 +4,8 @@ import select
 import sys
 import threading
 
-HOST='127.0.0.1'
-PORT= 8070
+HOST = '127.0.0.1'
+PORT = 8070
 
 server=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server.bind((HOST,PORT))
@@ -24,9 +24,11 @@ def handle(client):
     while True:
         try:
             
-            message= client.recv(1024)
+            message = client.recv(1024)
+            
             print(f"{nicknames[clients.index(client)]}")
             broacast(message)
+            
 
         except:
             index =clients.index(client)
