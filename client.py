@@ -69,13 +69,14 @@ class Client:
 
     def write(self):
 
-        massege = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
-        self.sock.send(massege.encode('utf-8'))
+        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
+        self.sock.send(message.encode('utf-8'))
         self.input_area.delete('1.0', 'end')
 
     def list(self):
-        message="list"
+        message = "list"
         self.sock.send(message.encode('utf-8'))
+
 
     def private(self):
         # message="private"
