@@ -40,14 +40,15 @@ def handle(client):
                 names = ""
 
                 for name in nicknames:
-                    title = title + name + "    \n"
+                    title = title + name + "\n"
                     #print(name)
                 clients[index].send(title.encode('utf-8'))
-            # if message == "private":
-            #     pass
-            # else:
-            #     print(f"{nicknames[clients.index(client)]}")
-            #     broacast(message.encode('utf-8'))
+            if message == "private":
+                pass
+            else:
+                # print(f"{nicknames[clients.index(client)]}")
+                # broacast(message.encode('utf-8'))
+                pass
 
 
         except:
