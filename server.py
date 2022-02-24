@@ -1,4 +1,5 @@
 # Python program to implement server side of chat room.
+import json
 import socket
 import select
 import sys
@@ -23,11 +24,26 @@ def broacast(message):
 def handle(client):
     while True:
         try:
-            
-            message = client.recv(1024)
-            
-            print(f"{nicknames[clients.index(client)]}")
-            broacast(message)
+            index =clients.index(client)
+            # nickname =nicknames[index]
+            message = client.recv(1024).decode('utf-8')
+
+            if message == "list":
+
+                title="The connected users are:\n"
+                # title=str(title)+"\n"
+                #clients[index].send(title.encode('utf-8'))
+                print(str(nicknames))
+                names = ""
+                for name in nicknames:
+                    title = title+name+"\n"
+                    print(name)
+                clients[index].send(title.encode('utf-8'))
+            if message == "private":
+                pass
+            else:
+                print(f"{nicknames[clients.index(client)]}")
+                broacast(message.encode('utf-8'))
             
 
         except:
@@ -45,9 +61,11 @@ def receive():
         print(f"connected with {str(address)}!")
 
         client.send("NICK".encode('utf-8'))
-        nickname= client.recv(1024)
+        nickname= client.recv(1024).decode('utf-8')
+        print(nickname)
 
         nicknames.append(nickname)
+
         clients.append(client)
         
 
@@ -55,7 +73,7 @@ def receive():
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
         client.send("Connected to the server".encode('utf-8'))
 
-        thread = threading.Thread(target= handle,args=(client,address))
+        thread = threading.Thread(target= handle,args=(client,))
         thread.start()
 
 
