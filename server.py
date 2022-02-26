@@ -17,7 +17,7 @@ clients = []
 nicknames = []
 
 
-# broacast
+# broacast -- send to all
 def broacast(message):
     for client in clients:
         client.send(message)
@@ -26,10 +26,10 @@ def broacast(message):
 def private_message(send_to,message,client1):
     sender_index =clients.index(client1)
     send_to_index=-1
-    print("private massege send: "+send_to)
+    #serching the correct client in clients to send him the messege
     for client in clients:
         nickname =nicknames[clients.index(client)]
-        print("--------"+ nickname+"--------------")
+
         if nickname==send_to:
             send_to_index=0
             str=message.replace('-#','')
@@ -66,23 +66,18 @@ def handle(client):
 
 
             if '-#private' in message:
-                print("full message: "+message2)
+
                 message2=message.replace("-#private","")
-                print(message2+"-----------------")
+
                 for name in nicknames:
                     temp_name='-#'+name
-                    print(temp_name)
                     if temp_name in message2:
                         send_to=name
-                        print("private:   "+send_to+"---- "+message2)
-
                         private_message(send_to,message2,client)
 
 
             if '-#everyone' in message:
                 message2=message.replace("-#everyone","")
-
-                print("server: "+message2)
                 print(f"{nicknames[clients.index(client)]}")
                 broacast(message2.encode('utf-8'))
 
