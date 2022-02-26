@@ -34,7 +34,7 @@ def private_message(send_to,message,client1):
             send_to_index=0
             str=message.replace('-#','')
 
-            str2="(private)"+str
+            str2="private to: "+str
             client.send(str2.encode('utf-8'))
             client1.send(str2.encode('utf-8'))
     if send_to_index==-1:

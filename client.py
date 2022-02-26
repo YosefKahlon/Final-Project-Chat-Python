@@ -36,7 +36,7 @@ class Client:
         self.win = tkinter.Tk()
         self.win.configure(bg="lightgray")
 
-        self.chat_label = tkinter.Label(self.win, text="Chat:", bg="lightgray")
+        self.chat_label = tkinter.Label(self.win, text="Chat: " + self.nickname, bg="lightgray")
         self.chat_label.config(font=("Arial", 12))
         self.chat_label.pack(padx=20, pady=5)
 
