@@ -28,15 +28,12 @@ def handle(client):
     while True:
         try:
             index = clients.index(client)
-            # nickname =nicknames[index]
             message = client.recv(1024).decode('utf-8')
 
             if message == "list":
 
                 title = "The connected users are:\n"
-                # title=str(title)+"\n"
-                # clients[index].send(title.encode('utf-8'))
-               # print(str(nicknames))
+
                 names = ""
 
                 for name in nicknames:
@@ -45,10 +42,12 @@ def handle(client):
                 clients[index].send(title.encode('utf-8'))
             if message == "private":
                 pass
+            #sent to  all
             else:
-                # print(f"{nicknames[clients.index(client)]}")
-                # broacast(message.encode('utf-8'))
-                pass
+                print(f"{nicknames[clients.index(client)]}")
+                broacast(message.encode('utf-8'))
+
+
 
 
         except:
@@ -75,9 +74,13 @@ def receive():
 
         clients.append(client)
 
+        ## message to the server for new enetry to the server
         print(f"Nickname of the client is {nickname}")
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
         client.send("Connected to the server".encode('utf-8'))
+
+
+
 
         thread = threading.Thread(target=handle, args=(client,))
         thread.start()
@@ -85,3 +88,5 @@ def receive():
 
 print("server running......")
 receive()
+
+
