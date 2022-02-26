@@ -177,7 +177,7 @@ class Client:
 
     def private(self):
         if self.input_private_area.get('1.0', 'end') != "":
-            message = f"-#private -# {self.input_private_area.get('1.0', 'end')} -# {self.nickname}: {self.input_area.get('1.0', 'end')}"
+            message = f"-#private -#{self.input_private_area.get('1.0', 'end')}-# {self.nickname}: {self.input_area.get( '1.0' , 'end')}"
             print("private message"+ message)
             self.sock.send(message.encode('utf-8'))
 
@@ -202,7 +202,6 @@ class Client:
 
                 else:
                     if self.gui_done:
-                        txt=message.split("@-")
                         self.text_area.config(state='normal')
                         self.text_area.insert('end', message)
                         self.text_area.yview('end')

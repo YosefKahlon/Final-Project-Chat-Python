@@ -23,16 +23,23 @@ def broacast(message):
         client.send(message)
 
 
-def private_message(sent_to,message,client1):
+def private_message(send_to,message,client1):
     sender_index =clients.index(client1)
     send_to_index=-1
+    print("private massege send: "+send_to)
     for client in clients:
-        if client.nickname==sent_to:
-            send_to_index=clients.index(client)
-    if sender_index==-1:
-        clients[sender_index].send(("not connected or worng name").encode('utf-8'))
-    if sender_index>-1:
-        clients[send_to_index].send(message.encode('utf-8'))
+        nickname =nicknames[clients.index(client)]
+        print("--------"+ nickname+"--------------")
+        if nickname==send_to:
+            send_to_index=0
+            str=message.replace('-#','')
+
+            str2="(private)"+str
+            client.send(str2.encode('utf-8'))
+            client1.send(str2.encode('utf-8'))
+    if send_to_index==-1:
+        clients[sender_index].send("not connected or worng name".encode('utf-8'))
+
 
 
 def show_online(index):
@@ -51,26 +58,33 @@ def handle(client):
             index = clients.index(client)
             # nickname =nicknames[index]
             message = client.recv(1024).decode('utf-8')
-            print(message)
+            print(type(message))
+
 
             if message== "-#list":
                 show_online(index)
 
 
             if '-#private' in message:
-                message.replace("-#private","")
+                print("full message: "+message2)
+                message2=message.replace("-#private","")
+                print(message2+"-----------------")
                 for name in nicknames:
-                    if '-#'+name+'-#' in message:
+                    temp_name='-#'+name
+                    print(temp_name)
+                    if temp_name in message2:
                         send_to=name
-                private_message(send_to,message,client)
+                        print("private:   "+send_to+"---- "+message2)
+
+                        private_message(send_to,message2,client)
 
 
             if '-#everyone' in message:
-                message.replace("-#everyone","")
+                message2=message.replace("-#everyone","")
 
-                print("server: "+message)
+                print("server: "+message2)
                 print(f"{nicknames[clients.index(client)]}")
-                broacast(message.encode('utf-8'))
+                broacast(message2.encode('utf-8'))
 
         except:
             index = clients.index(client)
