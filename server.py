@@ -20,28 +20,56 @@ nicknames=[]
 def broacast(message):
     for client in clients:
         client.send(message)
+
+
+def private_message(sent_to,message,client1):
+    sender_index =clients.index(client1)
+    send_to_index=-1
+    for client in clients:
+        if client.nickname==sent_to:
+            send_to_index=clients.index(client)
+    if sender_index==-1:
+        clients[sender_index].send(("not connected or worng name").encode('utf-8'))
+    if sender_index>-1:
+        clients[send_to_index].send(message.encode('utf-8'))
+
+
+def show_online(index):
+    title="The connected users are:\n"
+
+    names = ""
+    for name in nicknames:
+        title = title+name+"  \n"
+    clients[index].send(title.encode('utf-8'))
+
 #handle
 def handle(client):
     while True:
         try:
+
             index =clients.index(client)
             # nickname =nicknames[index]
             message = client.recv(1024).decode('utf-8')
+            print(message)
 
-            if message == "list":
 
-                title="The connected users are:\n"
-                # title=str(title)+"\n"
-                #clients[index].send(title.encode('utf-8'))
-                print(str(nicknames))
-                names = ""
+
+
+            if message== "-#list":
+                show_online(index)
+
+            if '-#private' in message:
+                message.replace("-#private","")
                 for name in nicknames:
-                    title = title+name+"\n"
-                    print(name)
-                clients[index].send(title.encode('utf-8'))
-            if message == "private":
-                pass
-            else:
+                    if '-#'+name+'-#' in message:
+                        send_to=name
+                private_message(send_to,message,client)
+
+
+            if '-#everyone' in message:
+                message.replace("-#everyone","")
+
+                print("server: "+message)
                 print(f"{nicknames[clients.index(client)]}")
                 broacast(message.encode('utf-8'))
             
