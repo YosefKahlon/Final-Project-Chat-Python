@@ -76,20 +76,13 @@ class Client:
 
     def write(self):
 
-<<<<<<< HEAD
         message = f"-#everyone {self.nickname}: {self.input_area.get('1.0', 'end')}"
-=======
-        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
->>>>>>> b410df71e8f5cf0c8221cd747a82a77e3d9090fc
+
         self.sock.send(message.encode('utf-8'))
         self.input_area.delete('1.0', 'end')
 
     def list(self):
-<<<<<<< HEAD
         message = "-#list"
-=======
-        message = "list"
->>>>>>> b410df71e8f5cf0c8221cd747a82a77e3d9090fc
         self.sock.send(message.encode('utf-8'))
 
 

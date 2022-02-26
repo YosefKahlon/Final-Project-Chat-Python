@@ -23,7 +23,6 @@ def broacast(message):
         client.send(message)
 
 
-<<<<<<< HEAD
 def private_message(sent_to,message,client1):
     sender_index =clients.index(client1)
     send_to_index=-1
@@ -44,30 +43,20 @@ def show_online(index):
         title = title+name+"  \n"
     clients[index].send(title.encode('utf-8'))
 
-#handle
-def handle(client):
-    while True:
-        try:
 
-            index =clients.index(client)
-=======
 # handle
 def handle(client):
     while True:
         try:
             index = clients.index(client)
->>>>>>> b410df71e8f5cf0c8221cd747a82a77e3d9090fc
             # nickname =nicknames[index]
             message = client.recv(1024).decode('utf-8')
             print(message)
 
-
-
-
             if message== "-#list":
                 show_online(index)
 
-<<<<<<< HEAD
+
             if '-#private' in message:
                 message.replace("-#private","")
                 for name in nicknames:
@@ -82,25 +71,6 @@ def handle(client):
                 print("server: "+message)
                 print(f"{nicknames[clients.index(client)]}")
                 broacast(message.encode('utf-8'))
-            
-=======
-                title = "The connected users are:\n"
-                # title=str(title)+"\n"
-                # clients[index].send(title.encode('utf-8'))
-               # print(str(nicknames))
-                names = ""
-
-                for name in nicknames:
-                    title = title + name + "    \n"
-                    #print(name)
-                clients[index].send(title.encode('utf-8'))
-            # if message == "private":
-            #     pass
-            # else:
-            #     print(f"{nicknames[clients.index(client)]}")
-            #     broacast(message.encode('utf-8'))
-
->>>>>>> b410df71e8f5cf0c8221cd747a82a77e3d9090fc
 
         except:
             index = clients.index(client)
