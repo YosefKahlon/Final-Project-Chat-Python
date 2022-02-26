@@ -60,9 +60,16 @@ class Client:
         self.list_button.config(font=("Arial", 12))
         self.list_button.pack(side=LEFT, padx=20, pady=5)
 
+        self.private_label = tkinter.Label(self.win, text="send to:", bg="lightgray")
+        self.private_label.config(font=("Arial", 12))
+        self.private_label.pack(padx=20, pady=5)
+
+        self.input_private_area = tkinter.Text(self.win, height=1, width=20, padx=5, pady=5)
+        self.input_private_area.pack(padx=20, pady=5)
+
         self.private_button = tkinter.Button(self.win, text="private", command=self.private)
         self.private_button.config(font=("Arial", 12))
-        self.private_button.pack(side=LEFT, padx=30, pady=5)
+        self.private_button.pack(padx=20, pady=5)
         self.gui_done = True
 
         self.win.geometry("200x250")
@@ -159,19 +166,22 @@ class Client:
 
     def write(self):
 
-        message = f"{self.nickname}: {self.input_area.get('1.0', 'end')}"
+        message = f"-#everyone {self.nickname}: {self.input_area.get('1.0', 'end')}"
+
         self.sock.send(message.encode('utf-8'))
         self.input_area.delete('1.0', 'end')
 
     def list(self):
-        message = "list"
+        message = "-#list"
         self.sock.send(message.encode('utf-8'))
 
     def private(self):
-        # message="private"
-        #
-        # self.sock.send(message.encode('utf-8'))
-        pass
+        if self.input_private_area.get('1.0', 'end') != "":
+            message = f"-#private -# {self.input_private_area.get('1.0', 'end')} -# {self.nickname}: {self.input_area.get('1.0', 'end')}"
+            print("private message"+ message)
+            self.sock.send(message.encode('utf-8'))
+
+        self.input_area.delete('1.0', 'end')
 
     def stop(self):
         self.running = False
@@ -183,16 +193,16 @@ class Client:
         while self.running:
             try:
                 message = self.sock.recv(1024).decode('utf-8')
-                print(f"message {message} finish")
+
                 if message == 'NICK':
                     self.sock.send(self.nickname.encode('utf-8'))
-                if message == "list":
-                    self.sock.send(self.nickname.encode('utf-8'))
-                if message == "private":
-                    self.sock.send(self.nickname.encode('utf-8'))
+
+
+
 
                 else:
                     if self.gui_done:
+                        txt=message.split("@-")
                         self.text_area.config(state='normal')
                         self.text_area.insert('end', message)
                         self.text_area.yview('end')
