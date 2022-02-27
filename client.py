@@ -69,7 +69,10 @@ class Client:
         self.private_button = tkinter.Button(self.win, text="private", command=self.private)
         self.private_button.config(font=("Arial", 12))
         self.private_button.pack(padx=20, pady=5)
+
         self.gui_done = True
+
+
 
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
         self.win.mainloop()
@@ -84,7 +87,6 @@ class Client:
     def list(self):
         message = "-#list"
         self.sock.send(message.encode('utf-8'))
-
 
     def private(self):
         if self.input_private_area.get('1.0', 'end') != "":
@@ -107,9 +109,6 @@ class Client:
 
                 if message == 'NICK':
                     self.sock.send(self.nickname.encode('utf-8'))
-
-
-
 
                 else:
                     if self.gui_done:

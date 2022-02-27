@@ -50,15 +50,13 @@ def show_online(index):
         title = title+name+"  \n"
     clients[index].send(title.encode('utf-8'))
 
-
 # handle
 def handle(client):
     while True:
         try:
             index = clients.index(client)
-            # nickname =nicknames[index]
+            nickname =nicknames[index]
             message = client.recv(1024).decode('utf-8')
-            print(type(message))
 
 
             if message== "-#list":
