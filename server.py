@@ -25,20 +25,19 @@ def broacast(message):
 
 def private_message(send_to,message,client1):
     sender_index =clients.index(client1)
-    send_to_index=-1
+    sender_nickname =nicknames[clients.index(client1)]
     #serching the correct client in clients to send him the messege
     for client in clients:
         nickname =nicknames[clients.index(client)]
 
         if nickname==send_to:
-            send_to_index=0
             str=message.replace('-#','')
-
             str2="private to: "+str
             client.send(str2.encode('utf-8'))
-            client1.send(str2.encode('utf-8'))
-    if send_to_index==-1:
-        clients[sender_index].send("not connected or worng name".encode('utf-8'))
+
+            if sender_nickname!=nickname:
+                client1.send(str2.encode('utf-8'))
+
 
 
 
@@ -66,12 +65,17 @@ def handle(client):
             if '-#private' in message:
 
                 message2=message.replace("-#private","")
-
+                send_to_index=True
                 for name in nicknames:
                     temp_name='-#'+name
                     if temp_name in message2:
+                        send_to_index=False
                         send_to=name
                         private_message(send_to,message2,client)
+                if send_to_index:
+                    message2="The user is not connected or the name is incorrect\n"
+                    client.send(message2.encode('utf-8'))
+
 
 
             if '-#everyone' in message:
@@ -80,12 +84,14 @@ def handle(client):
                 broacast(message2.encode('utf-8'))
 
         except:
+            message="The user "+nickname+" has left the chat\n"
+
             index = clients.index(client)
             clients.remove(client)
             client.close()
             nickname = nicknames[index]
             nicknames.remove(nickname)
-
+            broacast(message.encode('utf-8'))
             break
 
 
