@@ -5,22 +5,25 @@ import select
 import sys
 import threading
 
-HOST = '127.0.0.1'
+# HOST = '127.0.0.1'
+# PORT = 50011
+#
+# server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# server.bind((HOST, PORT))
 PORT = 50011
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((HOST, PORT))
+try:
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    host_ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# try:
-#     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#     file_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#     file_socket.connect(("8.8.8.8", 80))
-#     IP = file_socket.getsockname()[0]
-# except:
-#     IP="127.0.0.1"
-#
-
+    host_ip.connect(("8.8.8.8", 80))
+    HOST = host_ip.getsockname()[0]
+    print(HOST)
+except:
+    HOST = "127.0.0.1"
+    print(HOST)
+server.bind((HOST,PORT))
 server.listen()
 
 clients = []
