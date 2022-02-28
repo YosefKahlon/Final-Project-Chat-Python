@@ -33,6 +33,11 @@ nicknames = []
 server_files = ["yossi.txt", "gal.txt"]
 
 
+server_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_udp.accept()
+
+
+
 # broacast -- send to all
 def broacast(message):
     for client in clients:
@@ -80,6 +85,12 @@ def download(index, file_name):
     for file in server_files:
         if file == file_name:
             clients[index].send(message.encode('utf-8'))
+            try:
+                with open(file_name) as  f:
+                     server_udp.sendto(f,IP)
+
+
+
 
 
 # handle
