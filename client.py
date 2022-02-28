@@ -1,15 +1,24 @@
 # Python program to implement client side of chat room.
 
 import socket
+import sys
 import threading
 import tkinter
 import tkinter.scrolledtext
 from tkinter import LEFT, simpledialog
 from turtle import left
 
-HOST = '127.0.0.1'
-PORT = 50011
 
+
+# HOST = '127.0.0.1'
+# PORT = 50011
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+if len(sys.argv) != 3:
+    print ("Correct usage: script, IP address, port number")
+    exit()
+IP_address = str(sys.argv[1])
+Port = int(sys.argv[2])
+server.connect((IP_address, Port))
 
 
 class Client:
@@ -144,4 +153,4 @@ class Client:
                 break
 
 
-client = Client(HOST, PORT)
+client = Client(IP_address, Port)
