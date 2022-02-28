@@ -70,6 +70,10 @@ class Client:
         self.private_button.config(font=("Arial", 12))
         self.private_button.pack(padx=20, pady=5)
 
+        self.private_button = tkinter.Button(self.win, text="Download", command=self.download)
+        self.private_button.config(font=("Arial", 12))
+        self.private_button.pack(padx=20, pady=5)
+
         self.gui_done = True
 
 
@@ -95,6 +99,9 @@ class Client:
             self.sock.send(message.encode('utf-8'))
 
         self.input_area.delete('1.0', 'end')
+    def download(self):
+        message="you bitch!!"
+        self.sock.send(message.encode('utf-8'))
 
     def stop(self):
         self.running = False
