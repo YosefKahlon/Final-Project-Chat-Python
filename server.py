@@ -81,8 +81,12 @@ def download(index, file_name):
         if file == file_name:
             clients[index].send(message.encode('utf-8'))
             try:
-                with open(file_name) as  f:
-                     server_udp.sendto(f,IP)
+                with open(file_name,"r+") as  f:
+                       server_udp.sendto(f , (HOST,PORT))
+
+
+
+
 
 
 
