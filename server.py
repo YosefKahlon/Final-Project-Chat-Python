@@ -57,7 +57,8 @@ def handle(client):
             nickname =nicknames[index]
             message = client.recv(1024).decode('utf-8')
 
-
+            if message=="you bitch!!":
+                client.send(message.encode('utf-8'))
             if message== "-#list":
                 show_online(index)
 
