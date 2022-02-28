@@ -11,15 +11,10 @@ HOST = '127.0.0.1'
 PORT = 8070
 
 
-fragment_size = 500
-time_out = 4
-
-
 class Client:
 
     def __init__(self, host, port):
 
-#tcp
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((host, port))
 
@@ -27,11 +22,6 @@ class Client:
         msg.withdraw()
 
         self.nickname = simpledialog.askstring("Nickname ", "Pleas choosa a nickname", parent=msg)
-
-
-#udp
-        self.sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock_udp.connect((host, port))
 
         self.gui_done = False
         self.running = True
@@ -42,10 +32,6 @@ class Client:
         gui_thread.start()
         receive_thread.start()
 
-
-
-
-
     def gui_loop(self):
         self.win = tkinter.Tk()
         self.win.configure(bg="lightgray")
@@ -53,7 +39,6 @@ class Client:
         self.chat_label = tkinter.Label(self.win, text="Chat: " + self.nickname, bg="lightgray")
         self.chat_label.config(font=("Arial", 12))
         self.chat_label.pack(padx=20, pady=5)
-
 
         self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
         self.text_area.pack(padx=20, pady=5)
@@ -74,8 +59,6 @@ class Client:
         self.list_button.config(font=("Arial", 12))
         self.list_button.pack(side=LEFT, padx=20, pady=5)
 
-
-
         self.private_label = tkinter.Label(self.win, text="send to:", bg="lightgray")
         self.private_label.config(font=("Arial", 12))
         self.private_label.pack(padx=20, pady=5)
@@ -86,11 +69,6 @@ class Client:
         self.private_button = tkinter.Button(self.win, text="private", command=self.private)
         self.private_button.config(font=("Arial", 12))
         self.private_button.pack(padx=20, pady=5)
-
-        self.server_file_button = tkinter.Button(self.win, text="Server file ", command=self.file_list)
-        self.server_file_button.config(font=("Arial", 12))
-        self.server_file_button.pack(side=LEFT, padx=30, pady=5)
-
 
         self.gui_done = True
 
@@ -108,10 +86,6 @@ class Client:
 
     def list(self):
         message = "-#list"
-        self.sock.send(message.encode('utf-8'))
-
-    def file_list(self):
-        message = "-#file_list"
         self.sock.send(message.encode('utf-8'))
 
     def private(self):
@@ -135,9 +109,6 @@ class Client:
 
                 if message == 'NICK':
                     self.sock.send(self.nickname.encode('utf-8'))
-
-
-
 
                 else:
                     if self.gui_done:
