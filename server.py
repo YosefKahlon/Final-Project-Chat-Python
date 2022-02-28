@@ -6,10 +6,11 @@ import sys
 import threading
 
 HOST = '127.0.0.1'
-PORT = 8070
+PORT = 50011
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((HOST, PORT))
+# server.bind((HOST, PORT))
 
 server.listen()
 
@@ -81,6 +82,8 @@ def handle(client):
                 show_online(index)
 
             if 'download_server_file' in message:
+                thread_udp = threading.Thread(target=handle2, args=(client,message,))
+                thread_udp.start()
                 bool = True
                 for file in server_files:
                     if file in message:
@@ -121,7 +124,22 @@ def handle(client):
             break
 
 
+# def udp_senf_file(index):
+#     pass
+
+
+server_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_udp.bind((HOST, 5001))
+
+
 # receive
+
+
+def handle2(client,message):
+    print("---sam--------"+message+"---ack------")
+
+
+
 def receive():
     while True:
         client, address = server.accept()
@@ -139,8 +157,12 @@ def receive():
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
         client.send("Connected to the server \n".encode('utf-8'))
 
-        thread = threading.Thread(target=handle, args=(client,))
+        thread = threading.Thread(target=handle, args=(client, ))
         thread.start()
+
+
+
+
 
 
 print("server running......")

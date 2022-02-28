@@ -8,7 +8,8 @@ from tkinter import LEFT, simpledialog
 from turtle import left
 
 HOST = '127.0.0.1'
-PORT = 8070
+PORT = 50011
+
 
 
 class Client:
