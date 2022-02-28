@@ -70,13 +70,18 @@ class Client:
         self.private_button.config(font=("Arial", 12))
         self.private_button.pack(padx=20, pady=5)
 
-        self.private_button = tkinter.Button(self.win, text="Download", command=self.download)
-        self.private_button.config(font=("Arial", 12))
-        self.private_button.pack(padx=20, pady=5)
+        self.server_files_button = tkinter.Button(self.win, text="show server files", command=self.server_files)
+        self.server_files_button.config(font=("Arial", 12))
+        self.server_files_button.pack(side=LEFT, padx=30, pady=5)
+
+        self.download_button = tkinter.Button(self.win, text="download", command=self.download)
+        self.download_button.config(font=("Arial", 12))
+        self.download_button.pack(padx=30, pady=5)
+
+        self.input_download_area = tkinter.Text(self.win, height=1, width=20, padx=5, pady=5)
+        self.input_download_area.pack(padx=20, pady=5)
 
         self.gui_done = True
-
-
 
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
         self.win.mainloop()
@@ -94,14 +99,20 @@ class Client:
 
     def private(self):
         if self.input_private_area.get('1.0', 'end') != "":
-            message = f"-#private -#{self.input_private_area.get('1.0', 'end')}-# {self.nickname}: {self.input_area.get( '1.0' , 'end')}"
-            print("private message"+ message)
+            message = f"-#private -#{self.input_private_area.get('1.0', 'end')}-# {self.nickname}: {self.input_area.get('1.0', 'end')}"
+            print("private message" + message)
             self.sock.send(message.encode('utf-8'))
 
         self.input_area.delete('1.0', 'end')
-    def download(self):
-        message="you bitch!!"
+
+    def server_files(self):
+        message = "you bitch!!"
         self.sock.send(message.encode('utf-8'))
+
+    def download(self):
+        message = f"download_server_file+{self.input_download_area.get('1.0', 'end')}"
+        self.sock.send(message.encode('utf-8'))
+        self.input_download_area.delete('1.0', 'end')
 
     def stop(self):
         self.running = False

@@ -15,6 +15,7 @@ server.listen()
 
 clients = []
 nicknames = []
+server_files = ["yossi.txt", "gal.txt"]
 
 
 # broacast -- send to all
@@ -23,69 +24,93 @@ def broacast(message):
         client.send(message)
 
 
-def private_message(send_to,message,client1):
-    sender_index =clients.index(client1)
-    sender_nickname =nicknames[clients.index(client1)]
-    #serching the correct client in clients to send him the messege
+def private_message(send_to, message, client1):
+    sender_index = clients.index(client1)
+    sender_nickname = nicknames[clients.index(client1)]
+    # serching the correct client in clients to send him the messege
     for client in clients:
-        nickname =nicknames[clients.index(client)]
+        nickname = nicknames[clients.index(client)]
 
-        if nickname==send_to:
-            str=message.replace('-#','')
-            str2="private to: "+str
+        if nickname == send_to:
+            str = message.replace('-#', '')
+            str2 = "private to: " + str
             client.send(str2.encode('utf-8'))
 
-            if sender_nickname!=nickname:
+            if sender_nickname != nickname:
                 client1.send(str2.encode('utf-8'))
 
 
-
-
 def show_online(index):
-    title="The connected users are:\n"
+    title = "---The connected users are:---\n"
 
     names = ""
     for name in nicknames:
-        title = title+name+"  \n"
+        title = title + name + "  \n"
+    title = title + "--- end users list --- \n"
     clients[index].send(title.encode('utf-8'))
+
+
+def show_server_files(index):
+    title = "---The files are: ---\n"
+
+    names = ""
+    for file in server_files:
+        title = title + file + "  \n"
+    title = title + "--- end files list ---\n"
+    clients[index].send(title.encode('utf-8'))
+
+
+def download(index, file_name):
+    message = "need to know how to download " + file_name + "\n"
+    for file in server_files:
+        if file == file_name:
+            clients[index].send(message.encode('utf-8'))
+
 
 # handle
 def handle(client):
     while True:
         try:
             index = clients.index(client)
-            nickname =nicknames[index]
+            nickname = nicknames[index]
             message = client.recv(1024).decode('utf-8')
 
-            if message=="you bitch!!":
-                client.send(message.encode('utf-8'))
-            if message== "-#list":
+            if message == "you bitch!!":
+                show_server_files(index)
+            if message == "-#list":
                 show_online(index)
 
+            if 'download_server_file' in message:
+                bool = True
+                for file in server_files:
+                    if file in message:
+                        bool = False
+                        download(index, file)
+                if bool:
+                    message2 = "The file is not exists or the name is incorrect\n"
+                    client.send(message2.encode('utf-8'))
 
             if '-#private' in message:
 
-                message2=message.replace("-#private","")
-                send_to_index=True
+                message2 = message.replace("-#private", "")
+                send_to_index = True
                 for name in nicknames:
-                    temp_name='-#'+name
+                    temp_name = '-#' + name
                     if temp_name in message2:
-                        send_to_index=False
-                        send_to=name
-                        private_message(send_to,message2,client)
+                        send_to_index = False
+                        send_to = name
+                        private_message(send_to, message2, client)
                 if send_to_index:
-                    message2="The user is not connected or the name is incorrect\n"
+                    message2 = "The user is not connected or the name is incorrect\n"
                     client.send(message2.encode('utf-8'))
 
-
-
             if '-#everyone' in message:
-                message2=message.replace("-#everyone","")
+                message2 = message.replace("-#everyone", "")
                 print(f"{nicknames[clients.index(client)]}")
                 broacast(message2.encode('utf-8'))
 
         except:
-            message="The user "+nickname+" has left the chat\n"
+            message = "The user " + nickname + " has left the chat\n"
 
             index = clients.index(client)
             clients.remove(client)
@@ -112,7 +137,7 @@ def receive():
 
         print(f"Nickname of the client is {nickname}")
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
-        client.send("Connected to the server".encode('utf-8'))
+        client.send("Connected to the server \n".encode('utf-8'))
 
         thread = threading.Thread(target=handle, args=(client,))
         thread.start()
