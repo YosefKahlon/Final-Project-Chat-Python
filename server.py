@@ -5,27 +5,22 @@ import select
 import sys
 import threading
 
-# HOST = '127.0.0.1'
-# PORT = 50011
-
-# server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# server.bind((HOST, PORT))
+HOST = '127.0.0.1'
+PORT = 50011
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind((HOST, PORT))
 
-# checks whether sufficient arguments have been provided
-if len(sys.argv) != 3:
-    print ("Correct usage: script, IP address, port number")
-    exit()
+# try:
+#     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#     file_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#     file_socket.connect(("8.8.8.8", 80))
+#     IP = file_socket.getsockname()[0]
+# except:
+#     IP="127.0.0.1"
+#
 
-# takes the first argument from command prompt as IP address
-IP_address = str(sys.argv[1])
-
-# takes second argument from command prompt as port number
-Port = int(sys.argv[2])
-
-server.bind((IP_address, Port))
 server.listen()
 
 clients = []
@@ -96,6 +91,8 @@ def handle(client):
                 show_online(index)
 
             if 'download_server_file' in message:
+                thread_udp = threading.Thread(target=handle2, args=(client,message,))
+                thread_udp.start()
                 bool = True
                 for file in server_files:
                     if file in message:
@@ -136,10 +133,21 @@ def handle(client):
             break
 
 
+# def udp_senf_file(index):
+#     pass
 
+
+server_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server_udp.bind((HOST, 5001))
 
 
 # receive
+
+
+def handle2(client,message):
+    print("---sam--------"+message+"---ack------")
+
+
 
 def receive():
     while True:
