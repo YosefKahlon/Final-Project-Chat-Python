@@ -10,20 +10,26 @@ from turtle import left
 
 
 
-HOST = '127.0.0.1'
+
 PORT = 50011
 
 
 
 class Client:
 
-    def __init__(self, host, port):
-
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((host, port))
+    def __init__(self, port):
 
         msg = tkinter.Tk()
         msg.withdraw()
+
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        host = simpledialog.askstring("IP", "Pleas input IP", parent=msg)
+        print(host)
+        host=str(host)
+        self.sock.connect((host, port))
+
+
+
 
         self.nickname = simpledialog.askstring("Nickname ", "Pleas choosa a nickname", parent=msg)
 
@@ -147,4 +153,4 @@ class Client:
                 break
 
 
-client = Client(HOST, PORT)
+client = Client(PORT)
