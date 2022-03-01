@@ -50,46 +50,54 @@ class Client:
         self.chat_label.config(font=("Arial", 12))
         self.chat_label.pack(padx=20, pady=5)
 
-        self.text_area = tkinter.scrolledtext.ScrolledText(self.win,height=5)
+        self.text_area = tkinter.scrolledtext.ScrolledText(self.win,height=7)
         self.text_area.pack(padx=20, pady=5)
         self.text_area.config(padx=20, pady=5)
 
-        self.msg_label = tkinter.Label(self.win, height=3,text="Message:", bg="lightgray")
+        self.msg_label = tkinter.Label(self.win, height=1,text="Message:", bg="lightgray")
         self.msg_label.config(font=("Arial", 12))
         self.msg_label.pack(padx=20, pady=5)
 
-        self.input_area = tkinter.Text(self.win, height=3)
+        self.input_area = tkinter.Text(self.win,width=50, height=3)
         self.input_area.pack(padx=20, pady=5)
 
         self.send_button = tkinter.Button(self.win, text="Send", command=self.write)
         self.send_button.config(font=("Arial", 12))
-        self.send_button.pack(side=LEFT, padx=5, pady=5)
+        self.send_button.pack(padx=5, pady=5)
+        self.send_button.place(x=5,y=200)
 
         self.list_button = tkinter.Button(self.win, text="Who is connected?", command=self.list)
         self.list_button.config(font=("Arial", 12))
-        self.list_button.pack(side=LEFT, padx=20, pady=5)
+        self.list_button.pack( padx=10, pady=5)
+        self.list_button.place(x=5,y=240)
 
         self.private_label = tkinter.Label(self.win, text="send to:", bg="lightgray")
         self.private_label.config(font=("Arial", 12))
-        self.private_label.pack(padx=20, pady=5)
+        self.private_label.pack(side=LEFT,padx=10, pady=5)
+
 
         self.input_private_area = tkinter.Text(self.win, height=1, width=20, padx=5, pady=5)
-        self.input_private_area.pack(padx=20, pady=5)
+        self.input_private_area.pack(side=LEFT,padx=10, pady=5)
 
         self.private_button = tkinter.Button(self.win, text="private", command=self.private)
         self.private_button.config(font=("Arial", 12))
-        self.private_button.pack(padx=20, pady=5)
+        self.private_button.pack(side=LEFT,padx=20, pady=5)
 
         self.server_files_button = tkinter.Button(self.win, text="show server files", command=self.server_files)
         self.server_files_button.config(font=("Arial", 12))
-        self.server_files_button.pack(side=LEFT, padx=30, pady=5)
+        self.server_files_button.pack( padx=30, pady=5)
+        self.server_files_button.place(x=600,y=200)
+
 
         self.download_button = tkinter.Button(self.win, text="download", command=self.download)
         self.download_button.config(font=("Arial", 12))
-        self.download_button.pack(padx=30, pady=5)
+        self.download_button.pack(padx=10, pady=5)
+        self.download_button.place(x=600,y=240)
+
 
         self.input_download_area = tkinter.Text(self.win, height=1, width=20, padx=5, pady=5)
         self.input_download_area.pack(padx=20, pady=5)
+        self.input_download_area.place(x=560,y=280)
 
         self.gui_done = True
 
