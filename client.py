@@ -21,12 +21,12 @@ class Client:
 
         msg = tkinter.Tk()
         msg.withdraw()
-
+        self.port=PORT
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = simpledialog.askstring("IP", "Pleas input IP", parent=msg)
         print(host)
-        host=str(host)
-        self.sock.connect((host, port))
+        self.host=str(host)
+        self.sock.connect((self.host, port))
 
 
 
@@ -50,11 +50,11 @@ class Client:
         self.chat_label.config(font=("Arial", 12))
         self.chat_label.pack(padx=20, pady=5)
 
-        self.text_area = tkinter.scrolledtext.ScrolledText(self.win)
+        self.text_area = tkinter.scrolledtext.ScrolledText(self.win,height=5)
         self.text_area.pack(padx=20, pady=5)
         self.text_area.config(padx=20, pady=5)
 
-        self.msg_label = tkinter.Label(self.win, text="Message:", bg="lightgray")
+        self.msg_label = tkinter.Label(self.win, height=3,text="Message:", bg="lightgray")
         self.msg_label.config(font=("Arial", 12))
         self.msg_label.pack(padx=20, pady=5)
 
@@ -129,6 +129,26 @@ class Client:
         self.win.destroy()
         self.sock.close()
         exit(0)
+    # def udp(self):
+    #
+    #     server_udp = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    #     server_udp.bind((self.host,self.port))
+    #
+    #     addr = (self.host,self.port)
+    #     buf=1024
+    #
+    #     f = open("yossi.txt",'wb')
+    #
+    #     data,addr = server_udp.recvfrom(buf)
+    #     try:
+    #         while(data):
+    #             f.write(data)
+    #             server_udp.settimeout(2)
+    #             data,addr = server_udp.recvfrom(buf)
+    #     except socket.timeout:
+    #         f.close()
+    #         server_udp.close()
+    #         print ("File Donwloaded")
 
     def recevie(self):
         while self.running:
@@ -137,6 +157,7 @@ class Client:
 
                 if message == 'NICK':
                     self.sock.send(self.nickname.encode('utf-8'))
+
 
                 else:
                     if self.gui_done:

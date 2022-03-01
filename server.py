@@ -78,6 +78,23 @@ def download(index, file_name):
     for file in server_files:
         if file == file_name:
             clients[index].send(message.encode('utf-8'))
+    # s = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    #
+    # buf =1024
+    # addr = (HOST,PORT)
+    #
+    #
+    # f=open(file_name,"rb")
+    # data = f.read(buf)
+    #
+    # s.sendto(file_name,addr)
+    # s.sendto(data,addr)
+    # while (data):
+    #     if(s.sendto(data,addr)):
+    #         print ("sending ...")
+    #         data = f.read(buf)
+    # s.close()
+    # f.close()
 
 
 # handle
@@ -94,8 +111,7 @@ def handle(client):
                 show_online(index)
 
             if 'download_server_file' in message:
-                thread_udp = threading.Thread(target=handle2, args=(client,message,))
-                thread_udp.start()
+
                 bool = True
                 for file in server_files:
                     if file in message:
@@ -136,21 +152,8 @@ def handle(client):
             break
 
 
-# def udp_senf_file(index):
-#     pass
-
-
-server_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_udp.bind((HOST, 5001))
-
 
 # receive
-
-
-def handle2(client,message):
-    print("---sam--------"+message+"---ack------")
-
-
 
 def receive():
     while True:
