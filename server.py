@@ -116,13 +116,13 @@ def download(client, file_name):
         max_time = time.time()
 
         # send all the packets in the window
-        for i in range (N):
-            curr_packet = total_data[(curr_state+i) * PKT_SIZE : (curr_state+i) * PKT_SIZE + PKT_SIZE  ]
+        for i in range(N):
+            curr_packet = total_data[(curr_state+i) * PKT_SIZE: (curr_state+i) * PKT_SIZE + PKT_SIZE]
             packet_data=curr_packet
             packet_length=len(curr_packet)
             packet_sq_n = curr_state+i
             packet_to_send = f"{str(packet_sq_n)}~{str(len(total_data))}~{str(packet_length)}~{packet_data}"
-            print(packet_to_send.encode())
+            print(packet_to_send)
 
             UDP_sock.sendto(packet_to_send.encode('utf-8') , address)
             print (f"packet number {curr_state+i} was sent ")

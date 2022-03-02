@@ -150,12 +150,14 @@ class Client:
 
     def download(self):
         message = f"download_server_file+{self.input_download_area.get('1.0', 'end')}"
-        self.sock.send(message.encode('utf-8'))
-        self.input_download_area.delete('1.0', 'end')
-        file=self.input_download_area.get('1.0', 'end')
-        udp_sock = threading.Thread(target=self.handle_down, args=(file))
-        udp_sock.start()
 
+        self.sock.send(message.encode('utf-8'))
+
+        file=self.input_download_area.get('1.0', 'end')
+        print(file+"----------")
+        udp_sock = threading.Thread(target=self.handle_down, args=(file,))
+        udp_sock.start()
+        self.input_download_area.delete('1.0', 'end')
 
 
 
@@ -164,6 +166,7 @@ class Client:
         self.win.destroy()
         self.sock.close()
         exit(0)
+
     def handle_down(self,filename):
         self.progress_bar['value'] = 0
         # at the begining of the download reset to play mode
@@ -172,12 +175,10 @@ class Client:
         STATE = 1
 
         UDP_socket = socket.socket(socket.AF_INET , socket.SOCK_DGRAM)
-        server = (HOST , PORT_UDP)
         filename=filename.replace("\n","")
-        print(filename)
-        file_r = open("transfered_"+filename , 'w+')
+        print(filename+"---------------\n")
+        file_r = open("transfered_" + filename, 'w+')
         packet_counter = 0
-        total_length = 0
         accumulated_length = 0
         UDP_socket.bind((HOST , PORT_UDP))
         while True :
@@ -189,7 +190,7 @@ class Client:
             if STATE == 2:
                 break
             try :
-                data , server = UDP_socket.recvfrom(2048)
+                data, server = UDP_socket.recvfrom(2048)
                 print(data)
             except:
                 print("connection doesn't succeed -> try again ")
@@ -214,22 +215,26 @@ class Client:
                 UDP_socket.sendto(str(ACK).encode('utf-8') , server)
             else :
                 print("wrong packet ! return request ")
-                UDP_socket.sendto(str(packet_counter).encode('utf-8') , server)
+                UDP_socket.sendto(str(packet_counter).encode('utf-8'), server)
                 continue
-
-            if int(splited_data[2]) < PKT_SIZE:
+            print(splited_data[2]+"--------------------")
+            if  int(splited_data[2]) < PKT_SIZE:
+                print("here")
                 UDP_socket.sendto("FIN".encode('utf-8') , server)
                 break
+
         print("end of transfert -> closing socket ...")
         file_re = file_r.read()
         bytearr = bytearray(file_re , "utf8")
-        self.chat_box.config(state='normal')
-        self.chat_box.insert('end' ,f"the last byte is {bytearr[-1:]}\n")
-        self.chat_box.yview('end')
-        self.chat_box.config(state='disabled')
         file_r.close()
-
         UDP_socket.close()
+        print("closeeeeeeeee")
+        self.text_area.config(state='normal')
+        self.text_area.insert('end' ,f"the last byte is {bytearr[-1:]}\n")
+        self.text_area.yview('end')
+        self.text_area.config(state='disabled')
+
+
 
     # send command to server to pause the download
     def pause_down(self):
