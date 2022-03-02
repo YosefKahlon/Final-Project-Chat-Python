@@ -23,17 +23,12 @@ try:
 except:
     HOST = "127.0.0.1"
     print(HOST)
-server.bind((HOST,PORT))
+server.bind((HOST, PORT))
 server.listen()
 
 clients = []
 nicknames = []
 server_files = ["yossi.txt", "gal.txt"]
-
-
-server_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_udp.accept()
-
 
 
 # broacast -- send to all
@@ -79,20 +74,42 @@ def show_server_files(index):
 
 
 def download(index, file_name):
-    message = "need to know how to download " + file_name + "\n"
+    server_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    server_udp.bind((HOST, 5001))
+    print("server udp is runing ... ")
+
+    message = "need to know how to download " + file_name
     for file in server_files:
         if file == file_name:
             clients[index].send(message.encode('utf-8'))
+            print("here u go :")
+            print(file_name)
+            server_udp.sendto("ack ".encode('utf-8'), (HOST, PORT))
+            # server_udp.sendto(file_name.encode('utf-8'), (HOST, PORT))
             try:
-                with open(file_name,"r+") as  f:
-                       server_udp.sendto(f , (HOST,PORT))
+                with open(file_name, "r") as f:
+                     data = f.read()
+                #     while data:
+                #         print(data)
+                #         server_udp.sendto(data.encode('utf-8'), (HOST, PORT))
+            except:
+                print("no good !!")
 
-
-
-
-
-
-
+            #
+            # try:
+            #     server_udp.sendto(file_name.encode('utf-8'), (HOST, PORT))
+            #     with open(file_name, "r") as f:
+            #         data = f.read(500)
+            #         while data:
+            #             print(data)
+            #             if server_udp.sendto(data.encode('utf-8'), (HOST, PORT)):
+            #                 data = f.read(500)
+            #
+            #         server_udp.close()
+            # except FileExistsError:
+            #     print("prob 0")
+            # except FileNotFoundError:
+            #     print("prob 1 ")
 
 
 # handle
@@ -109,7 +126,7 @@ def handle(client):
                 show_online(index)
 
             if 'download_server_file' in message:
-                thread_udp = threading.Thread(target=handle2, args=(client,message,))
+                thread_udp = threading.Thread(target=handle2, args=(client, message,))
                 thread_udp.start()
                 bool = True
                 for file in server_files:
@@ -155,16 +172,11 @@ def handle(client):
 #     pass
 
 
-server_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_udp.bind((HOST, 5001))
-
-
 # receive
 
 
-def handle2(client,message):
-    print("---sam--------"+message+"---ack------")
-
+def handle2(client, message):
+    print("---sam--------" + message + "---ack------")
 
 
 def receive():
@@ -184,12 +196,8 @@ def receive():
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
         client.send("Connected to the server \n".encode('utf-8'))
 
-        thread = threading.Thread(target=handle, args=(client, ))
+        thread = threading.Thread(target=handle, args=(client,))
         thread.start()
-
-
-
-
 
 
 print("server running......")

@@ -8,11 +8,9 @@ import tkinter.scrolledtext
 from tkinter import LEFT, simpledialog
 from turtle import left
 
-
-
-
 PORT = 50011
 
+global HOST
 
 
 class Client:
@@ -23,13 +21,10 @@ class Client:
         msg.withdraw()
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        host = simpledialog.askstring("IP", "Pleas input IP", parent=msg)
-        print(host)
-        host=str(host)
-        self.sock.connect((host, port))
-
-
-
+        self.host = simpledialog.askstring("IP", "Pleas input IP", parent=msg)
+        print(self.host)
+        self.host = str(self.host)
+        self.sock.connect((self.host, port))
 
         self.nickname = simpledialog.askstring("Nickname ", "Pleas choosa a nickname", parent=msg)
 
@@ -122,6 +117,8 @@ class Client:
     def download(self):
         message = f"download_server_file+{self.input_download_area.get('1.0', 'end')}"
         self.sock.send(message.encode('utf-8'))
+        file = self.input_download_area.get('1.0', 'end')
+        self.udp(file)
         self.input_download_area.delete('1.0', 'end')
 
     def stop(self):
@@ -151,6 +148,41 @@ class Client:
                 print("Error")
                 self.sock.close()
                 break
+
+    def udp(self, file):
+        self.sock_udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.sock_udp.bind((self.host, PORT))
+
+        data = self.sock_udp.recv(1024).decode('utf-8')
+        try:
+            with open(data, "r") as f:
+                print(f.read())
+
+        except:
+            print("ttt")
+
+        # try:
+        #     with open("yossi.txt", "w") as f:
+        #         print('New file created')
+        #
+        #         while True:
+        #             data, addr = self.sock_udp.recvfrom(1024)
+        #             print(data)
+        #             while (data):
+        #                 f.write(data.decode("utf-8"))
+        #                 print("lalallala")
+        #                 data, addr = self.sock_udp.recvfrom(1024)
+        #                 print("blalala")
+        #
+        #             print('File is successfully received!!!')
+        #
+        #             with open("yossi.txt", "r") as f:
+        #                  print(f.read)
+        #
+        #             self.sock_udp.close()
+        #             print('Connection closed!')
+        # except FileExistsError:
+        #     self.sock_udp.close()
 
 
 client = Client(PORT)
