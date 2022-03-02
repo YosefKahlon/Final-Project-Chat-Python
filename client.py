@@ -5,14 +5,19 @@ import sys
 import threading
 import tkinter
 import tkinter.scrolledtext
-from tkinter import LEFT, simpledialog
+from time import sleep
+from tkinter import LEFT, simpledialog, HORIZONTAL
+from tkinter.ttk import Progressbar
 from turtle import left
 
 
 
 
 PORT = 50011
-
+STATE=0
+PORT_UDP=50012
+PKT_SIZE=500
+HOST='127.0.0.1'
 
 
 class Client:
@@ -24,7 +29,8 @@ class Client:
         self.port=PORT
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         host = simpledialog.askstring("IP", "Pleas input IP", parent=msg)
-        print(host)
+        global HOST
+        HOST=host
         self.host=str(host)
         self.sock.connect((self.host, port))
 
@@ -99,6 +105,21 @@ class Client:
         self.input_download_area.pack(padx=20, pady=5)
         self.input_download_area.place(x=560,y=280)
 
+        self.download_button = tkinter.Button(self.win, text="stop", command=self.stop_down)
+        self.download_button.config(font=("Arial", 12))
+        self.download_button.pack(padx=10, pady=5)
+
+        self.download_button = tkinter.Button(self.win, text="pause", command=self.pause_down)
+        self.download_button.config(font=("Arial", 12))
+        self.download_button.pack(padx=10, pady=5)
+
+        self.download_button = tkinter.Button(self.win, text="continue", command=self.continue_down())
+        self.download_button.config(font=("Arial", 12))
+        self.download_button.pack(padx=10, pady=5)
+
+        self.progress_bar=Progressbar(self.win,orient=HORIZONTAL)
+        self.progress_bar.pack(padx=10, pady=5)
+
         self.gui_done = True
 
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
@@ -131,32 +152,99 @@ class Client:
         message = f"download_server_file+{self.input_download_area.get('1.0', 'end')}"
         self.sock.send(message.encode('utf-8'))
         self.input_download_area.delete('1.0', 'end')
+        file=self.input_download_area.get('1.0', 'end')
+        udp_sock = threading.Thread(target=self.handle_down, args=(file))
+        udp_sock.start()
+
+
+
 
     def stop(self):
         self.running = False
         self.win.destroy()
         self.sock.close()
         exit(0)
-    # def udp(self):
-    #
-    #     server_udp = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    #     server_udp.bind((self.host,self.port))
-    #
-    #     addr = (self.host,self.port)
-    #     buf=1024
-    #
-    #     f = open("yossi.txt",'wb')
-    #
-    #     data,addr = server_udp.recvfrom(buf)
-    #     try:
-    #         while(data):
-    #             f.write(data)
-    #             server_udp.settimeout(2)
-    #             data,addr = server_udp.recvfrom(buf)
-    #     except socket.timeout:
-    #         f.close()
-    #         server_udp.close()
-    #         print ("File Donwloaded")
+    def handle_down(self,filename):
+        self.progress_bar['value'] = 0
+        # at the begining of the download reset to play mode
+        global STATE
+        global PORT_UDP
+        STATE = 1
+
+        UDP_socket = socket.socket(socket.AF_INET , socket.SOCK_DGRAM)
+        server = (HOST , PORT_UDP)
+        filename=filename.replace("\n","")
+        print(filename)
+        file_r = open("transfered_"+filename , 'w+')
+        packet_counter = 0
+        total_length = 0
+        accumulated_length = 0
+        UDP_socket.bind((HOST , PORT_UDP))
+        while True :
+            print("waiting for reception ...")
+            # if the pause button was pushed
+            while STATE == 0 :
+                sleep(1)
+            #if the stop button was pushed
+            if STATE == 2:
+                break
+            try :
+                data , server = UDP_socket.recvfrom(2048)
+                print(data)
+            except:
+                print("connection doesn't succeed -> try again ")
+                continue
+
+
+            data = data.decode('utf-8')
+            splited_data = data.split('~')
+            print(splited_data)
+            total_length = int(splited_data[1])
+            sequence_data = splited_data[0]
+            print(f"packet number {sequence_data} was received  ")
+            if int(sequence_data) == packet_counter:
+                packet_counter+=1
+                new_data_part = splited_data[3]
+                file_r.write(new_data_part)
+                accumulated_length += int(splited_data[2])
+                print(f"{ (accumulated_length/total_length)*100}% completed ")
+                self.progress_bar['value']+=(int(splited_data[2])*100/(total_length))
+                print(f"part {sequence_data} was added to the file ")
+                ACK = sequence_data
+                UDP_socket.sendto(str(ACK).encode('utf-8') , server)
+            else :
+                print("wrong packet ! return request ")
+                UDP_socket.sendto(str(packet_counter).encode('utf-8') , server)
+                continue
+
+            if int(splited_data[2]) < PKT_SIZE:
+                UDP_socket.sendto("FIN".encode('utf-8') , server)
+                break
+        print("end of transfert -> closing socket ...")
+        file_re = file_r.read()
+        bytearr = bytearray(file_re , "utf8")
+        self.chat_box.config(state='normal')
+        self.chat_box.insert('end' ,f"the last byte is {bytearr[-1:]}\n")
+        self.chat_box.yview('end')
+        self.chat_box.config(state='disabled')
+        file_r.close()
+
+        UDP_socket.close()
+
+    # send command to server to pause the download
+    def pause_down(self):
+        global STATE
+        STATE = 0
+
+    # send command to server to continue the download
+    def continue_down(self):
+        global STATE
+        STATE = 1
+
+    #send command to server to stop the download
+    def stop_down(self):
+        global STATE
+        STATE = 2
 
     def recevie(self):
         while self.running:
