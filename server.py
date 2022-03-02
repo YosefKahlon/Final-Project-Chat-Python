@@ -32,7 +32,7 @@ server.listen()
 
 clients = []
 nicknames = []
-server_files = ["yossi.txt", "gal.txt"]
+server_files = ["yossi.txt", "gal.txt","avidan.png","final_project.pdf"]
 
 
 # broacast -- send to all
