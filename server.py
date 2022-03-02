@@ -14,8 +14,8 @@ import threading
 # server.bind((HOST, PORT))
 
 PORT = 50011
-PKT_SIZE=500
-PORT_UDP=50012
+PKT_SIZE = 500
+PORT_UDP = 50012
 try:
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -27,7 +27,7 @@ try:
 except:
     HOST = "127.0.0.1"
     print(HOST)
-server.bind((HOST,PORT))
+server.bind((HOST, PORT))
 server.listen()
 
 clients = []
@@ -77,7 +77,6 @@ def show_server_files(index):
     clients[index].send(title.encode('utf-8'))
 
 
-
 def download(client, file_name):
     # message = "need to know how to download " + file_name + "\n"
     # for file in server_files:
@@ -87,12 +86,12 @@ def download(client, file_name):
     print("UDP socket starting...")
     counter_packet = 0
     packet_lost = 0
-    address = (client.getsockname()[0],PORT_UDP)
+    address = (client.getsockname()[0], PORT_UDP)
     start = time.time()
-    packet_sq_n=0
-    packet_data=0
-    packet_length=0
-    packet_file=0
+    packet_sq_n = 0
+    packet_data = 0
+    packet_length = 0
+    packet_file = 0
 
     UDP_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -109,32 +108,32 @@ def download(client, file_name):
 
     # while the last packet was sent
     while curr_state < int((len(total_data) / PKT_SIZE) + 1):
-        print (f"{curr_state} <-> {int((len(total_data)/ PKT_SIZE)+1)}")
-        counter_packet +=1
+        print(f"{curr_state} <-> {int((len(total_data) / PKT_SIZE) + 1)}")
+        counter_packet += 1
 
-        #create a repere time for our timeout
+        # create a repere time for our timeout
         max_time = time.time()
 
         # send all the packets in the window
-        for i in range (N):
-            curr_packet = total_data[(curr_state+i) * PKT_SIZE : (curr_state+i) * PKT_SIZE + PKT_SIZE  ]
-            packet_data=curr_packet
-            packet_length=len(curr_packet)
-            packet_sq_n = curr_state+i
+        for i in range(N):
+            curr_packet = total_data[(curr_state + i) * PKT_SIZE: (curr_state + i) * PKT_SIZE + PKT_SIZE]
+            packet_data = curr_packet
+            packet_length = len(curr_packet)
+            packet_sq_n = curr_state + i
             packet_to_send = f"{str(packet_sq_n)}~{str(len(total_data))}~{str(packet_length)}~{packet_data}"
             print(packet_to_send.encode())
 
-            UDP_sock.sendto(packet_to_send.encode('utf-8') , address)
-            print (f"packet number {curr_state+i} was sent ")
+            UDP_sock.sendto(packet_to_send.encode('utf-8'), address)
+            print(f"packet number {curr_state + i} was sent ")
         max_time = time.time() - max_time
         curr_ACK = curr_state
         # while all the ack of the window was not received
-        while curr_ACK < curr_state + N-1:
-            #start timeout
+        while curr_ACK < curr_state + N - 1:
+            # start timeout
             start_time = time.time()
             try:
-                ACK , addresst = UDP_sock.recvfrom(200)
-            except :
+                ACK, addresst = UDP_sock.recvfrom(200)
+            except:
                 print("no message incoming")
                 continue
             # another that the last parcel of the file was delivered
@@ -144,26 +143,26 @@ def download(client, file_name):
             # if we get the ack of the good packet
             elif ACK.decode('utf-8') == str(curr_ACK):
                 curr_ACK += 1
-                print(f"packet number {curr_ACK - 1 } was received by the client ")
+                print(f"packet number {curr_ACK - 1} was received by the client ")
             # if we get an unwanted packet or the timeout passed
-            elif ( (int(ACK.decode('utf-8')) > curr_ACK) or (time.time()-start_time) > max_time ):
-                packet_lost+=1
+            elif ((int(ACK.decode('utf-8')) > curr_ACK) or (time.time() - start_time) > max_time):
+                packet_lost += 1
                 last_ack = curr_ACK
                 # resend the rest of the window that wasn't already received by the client
-                for i in range (curr_ACK , curr_state + N):
-                    curr_packet = total_data[(curr_ACK+i) * PKT_SIZE : (curr_ACK+i) * PKT_SIZE + PKT_SIZE  ]
-                    packet_data=curr_packet
-                    packet_length=len(curr_packet)
-                    packet_sq_n = curr_ACK+i
+                for i in range(curr_ACK, curr_state + N):
+                    curr_packet = total_data[(curr_ACK + i) * PKT_SIZE: (curr_ACK + i) * PKT_SIZE + PKT_SIZE]
+                    packet_data = curr_packet
+                    packet_length = len(curr_packet)
+                    packet_sq_n = curr_ACK + i
                     packet_to_send = f"{str(packet_sq_n)}~{str(len(total_data))}~{str(packet_length)}~{packet_data}"
                     print(packet_to_send.encode())
-                    UDP_sock.sendto(packet_to_send.encode('utf-8') , address)
-                    print (f"packet number {curr_ACK+i} was re-sent ")
+                    UDP_sock.sendto(packet_to_send.encode('utf-8'), address)
+                    print(f"packet number {curr_ACK + i} was re-sent ")
         curr_state = curr_ACK
 
-    print(f"summary :\n \t packet loss : {packet_lost} \n \t total of packet sent : {counter_packet} \n \t length of original packet/500 : {len(total_data)/PKT_SIZE} \n \t time elapsed : {str(time.time() - start)} seconds ")
+    print(
+        f"summary :\n \t packet loss : {packet_lost} \n \t total of packet sent : {counter_packet} \n \t length of original packet/500 : {len(total_data) / PKT_SIZE} \n \t time elapsed : {str(time.time() - start)} seconds ")
     UDP_sock.close()
-
 
 
 # handle
@@ -185,7 +184,7 @@ def handle(client):
                 for file in server_files:
                     if file in message:
                         bool = False
-                        udp_sock = threading.Thread(target=download, args=(client,file))
+                        udp_sock = threading.Thread(target=download, args=(client, file))
                         udp_sock.start()
                 if bool:
                     message2 = "The file is not exists or the name is incorrect\n"
@@ -222,7 +221,6 @@ def handle(client):
             break
 
 
-
 # receive
 
 def receive():
@@ -242,12 +240,8 @@ def receive():
         broacast(f"{nickname} connected to the server!\n".encode('utf-8'))
         client.send("Connected to the server \n".encode('utf-8'))
 
-        thread = threading.Thread(target=handle, args=(client, ))
+        thread = threading.Thread(target=handle, args=(client,))
         thread.start()
-
-
-
-
 
 
 print("server running......")
