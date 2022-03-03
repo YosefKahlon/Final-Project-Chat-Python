@@ -82,10 +82,8 @@ class Client:
         self.private_label.config(font=("Arial", 12))
         self.private_label.pack(side=LEFT, padx=10, pady=5)
 
-
         self.input_private_area = tkinter.Text(self.win, height=1, width=20, padx=5, pady=5)
         self.input_private_area.pack(side=LEFT, padx=10, pady=5)
-
 
         self.private_button = tkinter.Button(self.win, text="private", command=self.private)
         self.private_button.config(font=("Arial", 12))
@@ -107,14 +105,11 @@ class Client:
         self.input_download_area.pack(padx=20, pady=5)
         self.input_download_area.place(x=530, y=367)
 
-
-
         # stop download button
         self.stop_button = tkinter.Button(self.win, text="stop", command=self.stop_down)
         self.stop_button.config(font=("Arial", 12))
         self.stop_button.pack(padx=10, pady=5)
         self.stop_button.place(x=420, y=420)
-
 
         # pause download button
         self.pause_button = tkinter.Button(self.win, text="pause", command=self.pause_down)
@@ -128,17 +123,21 @@ class Client:
         self.continue_button.pack(padx=10, pady=5)
         self.continue_button.place(x=580, y=420)
 
-
-        #progress bar
-        self.progress_bar = Progressbar(self.win, orient=HORIZONTAL,length = 100, mode = 'determinate')
+        # progress bar
+        self.progress_bar = Progressbar(self.win, orient=HORIZONTAL, length=100, mode='determinate')
         self.progress_bar.pack(padx=10, pady=5)
         self.progress_bar.place(x=660, y=420)
+
+
+
 
 
         self.gui_done = True
         # 192.168.1.31
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
         self.win.mainloop()
+
+
 
     def write(self):
 
