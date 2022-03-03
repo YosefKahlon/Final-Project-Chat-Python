@@ -109,19 +109,13 @@ class Client:
         self.stop_button = tkinter.Button(self.win, text="stop", command=self.stop_down)
         self.stop_button.config(font=("Arial", 12))
         self.stop_button.pack(padx=10, pady=5)
-        self.stop_button.place(x=420, y=420)
+        self.stop_button.place(x=520, y=420)
 
         # pause download button
         self.pause_button = tkinter.Button(self.win, text="pause", command=self.pause_down)
         self.pause_button.config(font=("Arial", 12))
         self.pause_button.pack(padx=10, pady=5)
-        self.pause_button.place(x=500, y=420)
-
-        # continue download button
-        self.continue_button = tkinter.Button(self.win, text="continue", command=self.continue_down())
-        self.continue_button.config(font=("Arial", 12))
-        self.continue_button.pack(padx=10, pady=5)
-        self.continue_button.place(x=580, y=420)
+        self.pause_button.place(x=580, y=420)
 
         # progress bar
         self.progress_bar = Progressbar(self.win, orient=HORIZONTAL, length=100, mode='determinate')
@@ -197,9 +191,10 @@ class Client:
             while True:
                 print("waiting for reception ...")
                 # if the pause button was pushed
-                while STATE == 0:
+                while STATE % 2 == 0:
                     sleep(1)
                 # if the stop button was pushed
+
                 if STATE == 2:
                     break
                 try:
@@ -247,17 +242,15 @@ class Client:
         self.text_area.yview('end')
         self.text_area.config(state='disabled')
 
-    # send command to server to pause the download
+
+    """pause and continue download"""
     def pause_down(self):
         global STATE
-        STATE = 0
+        STATE +=1
 
-    # send command to server to continue the download
-    def continue_down(self):
-        global STATE
-        STATE = 1
 
-    # send command to server to stop the download
+
+    """stop the download and close the udp socket"""
     def stop_down(self):
         global STATE
         STATE = 2

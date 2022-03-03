@@ -101,10 +101,7 @@ def show_server_files(index):
 
 
 def download(client, file_name):
-    # message = "need to know how to download " + file_name + "\n"
-    # for file in server_files:
-    #     if file == file_name:
-    #         client.send(message.encode('utf-8'))
+
     N = 5
     print("UDP socket starting...")
     counter_packet = 0
