@@ -10,7 +10,7 @@ from tkinter import LEFT, simpledialog, HORIZONTAL
 from tkinter.ttk import Progressbar
 from turtle import left
 
-PORT = 50011 ## need to random
+PORT = 50011  ## need to random
 STATE = 0
 PORT_UDP = 50012
 PKT_SIZE = 500
@@ -18,6 +18,17 @@ HOST = '127.0.0.1'
 
 
 class Client:
+    """
+    The first steps of the client are to choose a nickname and to connect to our server.
+
+    Instead of binding the data and listening, we are connecting to an existing server.
+
+
+    Now, a client needs to have two threads that are running at the same time.
+     The first one will constantly receive data from the server
+     and the second one will send our own messages to the server.
+     So we will need two functions here.
+    """
 
     def __init__(self, port):
 
@@ -44,10 +55,11 @@ class Client:
 
 
 
-
-
+    """ 
+    create chat window (buttons,  text area..)
+    """
     def gui_loop(self):
-        # create chat window
+
         self.win = tkinter.Tk()
         self.win.configure(bg="light blue")
         self.win.geometry("900x500")
@@ -126,24 +138,24 @@ class Client:
         self.progress_bar.pack(padx=10, pady=5)
         self.progress_bar.place(x=660, y=420)
 
-
-
-
-
         self.gui_done = True
         # 192.168.1.31
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
         self.win.mainloop()
 
 
-
+    """
+    The writing function
+    runs in an endless loop which is always waiting for an 
+    input from the user. Once it gets some, it combines it with the nickname and sends it to the server. 
+    """
     def write(self):
-
         message = f"-#everyone {self.nickname}: {self.input_area.get('1.0', 'end')}"
-
         self.sock.send(message.encode('utf-8'))
         self.input_area.delete('1.0', 'end')
 
+
+    """A request list from the server of all connected"""
     def list(self):
         message = "-#list"
         self.sock.send(message.encode('utf-8'))
@@ -155,7 +167,7 @@ class Client:
             self.sock.send(message.encode('utf-8'))
 
         self.input_area.delete('1.0', 'end')
-
+    """ A request list from the server of all the server files """
     def server_files(self):
         message = "you bitch!!"
         self.sock.send(message.encode('utf-8'))
@@ -177,6 +189,7 @@ class Client:
         self.sock.close()
         exit(0)
 
+    ##todo change stuff and add our explosion
     def handle_down(self, filename):
         self.progress_bar['value'] = 0
         # at the begining of the download reset to play mode
@@ -246,19 +259,24 @@ class Client:
         self.text_area.yview('end')
         self.text_area.config(state='disabled')
 
-
     """pause and continue download"""
+
     def pause_down(self):
         global STATE
-        STATE +=1
-
-
+        STATE += 1
 
     """stop the download and close the udp socket"""
+
     def stop_down(self):
         global STATE
         STATE = 2
 
+
+    """"
+    in this function we constantly tries to receive messages and to print them onto the screen.
+    
+    :exception : In case there is some error, we close the connection and break the loop 
+    """
     def recevie(self):
         while self.running:
             try:
