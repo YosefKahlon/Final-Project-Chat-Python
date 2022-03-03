@@ -1,12 +1,14 @@
 # Python program to implement client side of chat room.
 
 import socket
+import sys
 import threading
 import tkinter
 import tkinter.scrolledtext
 from time import sleep
 from tkinter import LEFT, simpledialog, HORIZONTAL
 from tkinter.ttk import Progressbar
+from turtle import left
 
 PORT = 50011
 STATE = 0
@@ -41,35 +43,42 @@ class Client:
         receive_thread.start()
 
     def gui_loop(self):
+        # create chat window
         self.win = tkinter.Tk()
-        self.win.configure(bg="lightgray")
+        self.win.configure(bg="light blue")
+        self.win.geometry("900x500")
 
-        self.chat_label = tkinter.Label(self.win, text="Chat: " + self.nickname, bg="lightgray")
+        self.chat_label = tkinter.Label(self.win, text="Chat: " + self.nickname, bg="light blue")
         self.chat_label.config(font=("Arial", 12))
         self.chat_label.pack(padx=20, pady=5)
 
+        # Scrolled Text option
         self.text_area = tkinter.scrolledtext.ScrolledText(self.win, height=7)
         self.text_area.pack(padx=20, pady=5)
         self.text_area.config(padx=20, pady=5)
 
-        self.msg_label = tkinter.Label(self.win, height=1, text="Message:", bg="lightgray")
+        self.msg_label = tkinter.Label(self.win, height=1, text="Message:", bg="light blue")
         self.msg_label.config(font=("Arial", 12))
         self.msg_label.pack(padx=20, pady=5)
 
         self.input_area = tkinter.Text(self.win, width=50, height=3)
         self.input_area.pack(padx=20, pady=5)
 
-        self.send_button = tkinter.Button(self.win, text="Send", command=self.write)
+        # click to send
+        self.send_button = tkinter.Button(self.win, text="Send", command=self.write, height=1, width=10)
         self.send_button.config(font=("Arial", 12))
         self.send_button.pack(padx=5, pady=5)
-        self.send_button.place(x=5, y=200)
+        self.send_button.place(x=400, y=280)
 
+        # list of all online
         self.list_button = tkinter.Button(self.win, text="Who is connected?", command=self.list)
         self.list_button.config(font=("Arial", 12))
         self.list_button.pack(padx=10, pady=5)
-        self.list_button.place(x=5, y=240)
+        self.list_button.place(x=100, y=420)
 
-        self.private_label = tkinter.Label(self.win, text="send to:", bg="lightgray")
+        # ----------------------------private ------------------------------------------------------
+
+        self.private_label = tkinter.Label(self.win, text="send to:", bg="light blue")
         self.private_label.config(font=("Arial", 12))
         self.private_label.pack(side=LEFT, padx=10, pady=5)
 
@@ -80,39 +89,55 @@ class Client:
         self.private_button.config(font=("Arial", 12))
         self.private_button.pack(side=LEFT, padx=20, pady=5)
 
+        # ----------------------- show server files---------------------------------------------
         self.server_files_button = tkinter.Button(self.win, text="show server files", command=self.server_files)
         self.server_files_button.config(font=("Arial", 12))
         self.server_files_button.pack(padx=30, pady=5)
-        self.server_files_button.place(x=600, y=200)
+        self.server_files_button.place(x=380, y=367)
 
+        # ----------------------- download server files---------------------------------------------
         self.download_button = tkinter.Button(self.win, text="download", command=self.download)
         self.download_button.config(font=("Arial", 12))
         self.download_button.pack(padx=10, pady=5)
-        self.download_button.place(x=600, y=240)
+        self.download_button.place(x=730, y=367)
 
         self.input_download_area = tkinter.Text(self.win, height=1, width=20, padx=5, pady=5)
         self.input_download_area.pack(padx=20, pady=5)
-        self.input_download_area.place(x=560, y=280)
+        self.input_download_area.place(x=530, y=367)
 
-        self.download_button = tkinter.Button(self.win, text="stop", command=self.stop_down)
-        self.download_button.config(font=("Arial", 12))
-        self.download_button.pack(padx=10, pady=5)
+        # stop download button
+        self.stop_button = tkinter.Button(self.win, text="stop", command=self.stop_down)
+        self.stop_button.config(font=("Arial", 12))
+        self.stop_button.pack(padx=10, pady=5)
+        self.stop_button.place(x=420, y=420)
 
-        self.download_button = tkinter.Button(self.win, text="pause", command=self.pause_down)
-        self.download_button.config(font=("Arial", 12))
-        self.download_button.pack(padx=10, pady=5)
+        # pause download button
+        self.pause_button = tkinter.Button(self.win, text="pause", command=self.pause_down)
+        self.pause_button.config(font=("Arial", 12))
+        self.pause_button.pack(padx=10, pady=5)
+        self.pause_button.place(x=500, y=420)
 
-        self.download_button = tkinter.Button(self.win, text="continue", command=self.continue_down())
-        self.download_button.config(font=("Arial", 12))
-        self.download_button.pack(padx=10, pady=5)
+        # continue download button
+        self.continue_button = tkinter.Button(self.win, text="continue", command=self.continue_down())
+        self.continue_button.config(font=("Arial", 12))
+        self.continue_button.pack(padx=10, pady=5)
+        self.continue_button.place(x=580, y=420)
 
-        self.progress_bar = Progressbar(self.win, orient=HORIZONTAL)
+        # progress bar
+        self.progress_bar = Progressbar(self.win, orient=HORIZONTAL, length=100, mode='determinate')
         self.progress_bar.pack(padx=10, pady=5)
+        self.progress_bar.place(x=660, y=420)
+
+
+
+
 
         self.gui_done = True
-
+        # 192.168.1.31
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
         self.win.mainloop()
+
+
 
     def write(self):
 
@@ -164,62 +189,63 @@ class Client:
         UDP_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         filename = filename.replace("\n", "")
         print(filename + "---------------\n")
-        file_r = open("transfered_" + filename, 'w+')
-        packet_counter = 0
-        accumulated_length = 0
-        UDP_socket.bind((HOST, PORT_UDP))
-        while True:
-            print("waiting for reception ...")
-            # if the pause button was pushed
-            while STATE == 0:
-                sleep(1)
-            # if the stop button was pushed
-            if STATE == 2:
-                break
-            try:
-                data, server = UDP_socket.recvfrom(2048)
-                print(data)
-            except:
-                print("connection doesn't succeed -> try again ")
-                continue
+        # file_r = open("transferred_" + filename, 'w+')
+        with open("transferred_" + filename, 'w+') as file_r:
+            packet_counter = 0
+            accumulated_length = 0
+            UDP_socket.bind((HOST, PORT_UDP))
+            while True:
+                print("waiting for reception ...")
+                # if the pause button was pushed
+                while STATE == 0:
+                    sleep(1)
+                # if the stop button was pushed
+                if STATE == 2:
+                    break
+                try:
+                    data, server = UDP_socket.recvfrom(2048)
+                    data = data.decode('utf-8')
+                    print("data--------------------------------------------------> ", data)
+                except:
+                    print("connection doesn't succeed -> try again ")
+                    continue
 
-            data = data.decode('utf-8')
+                # data = data.decode('utf-8')
+                splited_data = data.split('~')
+                print(splited_data)
+                total_length = int(splited_data[1])
+                sequence_data = splited_data[0]
+                print(f"packet number {sequence_data} was received  ")
+                if int(sequence_data) == packet_counter:
+                    packet_counter += 1
+                    new_data_part = splited_data[3]
+                    file_r.write(new_data_part)
+                    accumulated_length += int(splited_data[2])
+                    print(f"{(accumulated_length / total_length) * 100}% completed ")
+                    self.progress_bar['value'] += (int(splited_data[2]) * 100 / (total_length))
+                    print(f"part {sequence_data} was added to the file ")
+                    ACK = sequence_data
+                    UDP_socket.sendto(str(ACK).encode('utf-8'), server)
+                else:
+                    print("wrong packet ! return request ")
+                    UDP_socket.sendto(str(packet_counter).encode('utf-8'), server)
+                    continue
+                print(splited_data[2] + "--------------------")
+                if int(splited_data[2]) < PKT_SIZE:
+                    print("here")
+                    UDP_socket.sendto("FIN".encode('utf-8'), server)
+                    break
 
-            splited_data = data.split('~')
-            print(splited_data)
-            total_length = int(splited_data[1])
-            sequence_data = splited_data[0]
-            print(f"packet number {sequence_data} was received  ")
-            if int(sequence_data) == packet_counter:
-                packet_counter += 1
-                new_data_part = splited_data[3]
-                file_r.write(new_data_part)
-                accumulated_length += int(splited_data[2])
-                print(f"{(accumulated_length / total_length) * 100} % completed ")
-                self.progress_bar['value'] += (int(splited_data[2]) * 100 / (total_length))
-                print(f"part {sequence_data} was added to the file ")
-                ACK = sequence_data
-                UDP_socket.sendto(str(ACK).encode('utf-8'), server)
-            else:
-                print("wrong packet ! return request ")
-                UDP_socket.sendto(str(packet_counter).encode('utf-8'), server)
-                continue
-            print(splited_data[2] + "--------------------")
-            if int(splited_data[2]) < PKT_SIZE:
-                print("here")
-                UDP_socket.sendto("FIN".encode('utf-8'), server)
-                break
-
-        print("end of transfert -> closing socket ...")
-        file_re = file_r.read()
-        file_r.close()
-        bytearr = bytearray(file_re, "utf8")
+            print("end of transfert -> closing socket ...")
+            file_re = file_r.read()
+            bytearr = bytearray(file_re, "utf8")
+        # file_r.close()
+        UDP_socket.close()
         print("closeeeeeeeee")
         self.text_area.config(state='normal')
         self.text_area.insert('end', f"the last byte is {bytearr[-1:]}\n")
         self.text_area.yview('end')
         self.text_area.config(state='disabled')
-        UDP_socket.close()
 
     # send command to server to pause the download
     def pause_down(self):
