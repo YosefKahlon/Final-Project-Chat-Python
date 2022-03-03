@@ -37,7 +37,7 @@ server.listen()
 """ clients about to join the server"""
 clients = []
 nicknames = []
-server_files = ["barak.png", "yossi.txt", "gal.txt"]
+server_files = ["barak.png", "yossi.txt", "gal.txt", "final.pdf"]
 
 """ broacast: Send a message to all clients connected to the server """
 
