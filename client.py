@@ -42,6 +42,10 @@ class Client:
         gui_thread.start()
         receive_thread.start()
 
+
+
+
+
     def gui_loop(self):
         # create chat window
         self.win = tkinter.Tk()
