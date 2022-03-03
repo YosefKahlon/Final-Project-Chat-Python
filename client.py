@@ -10,7 +10,7 @@ from tkinter import LEFT, simpledialog, HORIZONTAL
 from tkinter.ttk import Progressbar
 from turtle import left
 
-PORT = 50011
+PORT = 50011 ## need to random
 STATE = 0
 PORT_UDP = 50012
 PKT_SIZE = 500
