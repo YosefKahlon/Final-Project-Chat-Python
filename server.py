@@ -34,22 +34,22 @@ except:
 server.bind((HOST, PORT))
 server.listen()
 
-
-
 """ clients about to join the server"""
 clients = []
 nicknames = []
-server_files = ["yossi.txt", "gal.txt"]
+server_files = ["barak.png", "yossi.txt", "gal.txt"]
+
+""" broacast: Send a message to all clients connected to the server """
 
 
-
-""" Send a message to all clients connected to the server """
 def broacast(message):
     for client in clients:
         client.send(message)
 
 
 """ Send a message to a specific client on the server"""
+
+
 def private_message(send_to, message, client1):
     sender_index = clients.index(client1)
     sender_nickname = nicknames[clients.index(client1)]
@@ -66,7 +66,10 @@ def private_message(send_to, message, client1):
             if sender_nickname != nickname:
                 client1.send(str2.encode('utf-8'))
 
+
 """ List of online clients on the server """
+
+
 def show_online(index):
     title = "---The connected users are:---\n"
 
@@ -76,18 +79,21 @@ def show_online(index):
     title = title + "--- end users list --- \n"
     clients[index].send(title.encode('utf-8'))
 
+
 """ List of ready-to-download files """
+
+
 def show_server_files(index):
     title = "---The files are: ---\n"
-
     names = ""
     for file in server_files:
         title = title + file + "  \n"
+
     title = title + "--- end files list ---\n"
     clients[index].send(title.encode('utf-8'))
 
 
-#TODO WITH BIG EXPLINE
+# TODO WITH BIG EXPLINE
 """
  UDP SERVER 
  
@@ -114,10 +120,11 @@ def download(client, file_name):
 
     try:
         path = f'{file_name}'
-        fileToSend = open(path, 'rb')
-        total_data = fileToSend.read()
-        print(total_data)
-        fileToSend.close()
+        with open(path, 'rb') as fileToSend:
+            # fileToSend = open(path, 'rb')
+            total_data = fileToSend.read()
+            print(total_data)
+        # fileToSend.close()
     except:
         print("an error occur during the reading of the file")
         UDP_sock.close()
@@ -194,6 +201,8 @@ def download(client, file_name):
     close the connection and broadcast that this client has left the chat.
 
 """
+
+
 def handle(client):
     while True:
         try:
@@ -261,6 +270,8 @@ def handle(client):
     The reason for this is that we can only send bytes and not strings.
     So we always need to encode messages, when we send them and decode them, when we receive them.
 """
+
+
 def receive():
     while True:
         client, address = server.accept()
@@ -284,15 +295,6 @@ def receive():
 
 print("server running......")
 receive()
-
-
-
-
-
-
-
-
-
 
 """
 we got a lot of information from 
