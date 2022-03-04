@@ -117,7 +117,7 @@ def download(client, file_name):
 
     try:
         path = f'{file_name}'
-        with open(path, 'rb') as fileToSend:
+        with open(path, 'r') as fileToSend:
             # fileToSend = open(path, 'rb')
             total_data = fileToSend.read()
             print(total_data)

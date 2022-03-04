@@ -201,7 +201,7 @@ class Client:
         filename = filename.replace("\n", "")
         print(filename + "---------------\n")
         # file_r = open("transferred_" + filename, 'w+')
-        with open("transferred_" + filename, 'w+') as file_r:
+        with open("transferred_" + filename, 'w') as file_r:
             packet_counter = 0
             accumulated_length = 0
             UDP_socket.bind((HOST, PORT_UDP))
