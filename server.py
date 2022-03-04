@@ -16,8 +16,8 @@ import threading
 
 # connection data
 PORT = 50011
-PKT_SIZE = 500
-PORT_UDP = 50012
+
+UDP_port = 50012
 
 try:
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP SOCKET
@@ -93,97 +93,121 @@ def show_server_files(index):
     clients[index].send(title.encode('utf-8'))
 
 
-# TODO WITH BIG EXPLINE
 """
- UDP SERVER 
+ UDP SERVER using GO-BACK-N
+ in this method the server sends the necessary file for the client
+ Overly reliable - udp
  
+  about GO BACK N : 
+  sliding window protocol , 
+  the sender send multi of packet before the receiver send him back the acknowledge .
+  if the sender does not receive ACK  at the right time, all the 
+  packets will be send again .
+  
+  
+ :param : client on the server   
+ :param : file the client ask 
+ :exception : error with file  
  """
 
 
 def download(client, file_name):
+    pakt_size = 500
 
-    N = 5
-    print("UDP socket starting...")
-    counter_packet = 0
+    print("-------------SOCKET UDP IS READY------------------")
+    packet_counter = 0
     packet_lost = 0
-    address = (client.getsockname()[0], PORT_UDP)
-    start = time.time()
-    packet_sq_n = 0
-    packet_data = 0
-    packet_length = 0
-    packet_file = 0
+    address = (client.getsockname()[0], UDP_port)
+    start_time = time.time()
 
-    UDP_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP SOCKET
 
     try:
-        path = f'{file_name}'
-        with open(path, 'r') as fileToSend:
-            # fileToSend = open(path, 'rb')
+        with open(file_name, 'r') as fileToSend:
             total_data = fileToSend.read()
-            print(total_data)
-        # fileToSend.close()
+
+    except FileNotFoundError:
+        print("file is not found !!")
+        print("closing the socket.")
+        udp_socket.close()
+
     except:
-        print("an error occur during the reading of the file")
-        UDP_sock.close()
-    curr_state = 0
+        print("Error while trying open the file !!")
+        print("closing the socket.")
+        udp_socket.close()
 
-    # while the last packet was sent
-    while curr_state < int((len(total_data) / PKT_SIZE) + 1):
-        print(f"{curr_state} <-> {int((len(total_data) / PKT_SIZE) + 1)}")
-        counter_packet += 1
+    curr_status = 0
 
-        # create a repere time for our timeout
-        max_time = time.time()
+    file_size = total_data.__len__()
+
+    # sending all the packets
+    while curr_status < int((file_size / pakt_size) + 1):
+        packet_counter += 1
+
+        # open clock
+        second_time = time.time()
+
+        N = 5  # sliding window size
 
         # send all the packets in the window
+        # go back N
         for i in range(N):
-            curr_packet = total_data[(curr_state + i) * PKT_SIZE: (curr_state + i) * PKT_SIZE + PKT_SIZE]
+            curr_packet = total_data[(curr_status + i) * pakt_size: (curr_status + i) * pakt_size + pakt_size]
+
             packet_data = curr_packet
-            packet_length = len(curr_packet)
-            packet_sq_n = curr_state + i
-            packet_to_send = f"{str(packet_sq_n)}~{str(len(total_data))}~{str(packet_length)}~{packet_data}"
-            print(packet_to_send)
+            sequence_num = curr_status + i
+            packet_size = len(curr_packet)
 
-            UDP_sock.sendto(packet_to_send.encode('utf-8'), address)
-            print(f"packet number {curr_state + i} was sent ")
-        max_time = time.time() - max_time
-        curr_ACK = curr_state
-        # while all the ack of the window was not received
-        while curr_ACK < curr_state + N - 1:
-            # start timeout
-            start_time = time.time()
+            send_packet = f"{str(sequence_num)}~{str(file_size)}~{str(packet_size)}~{packet_data}"
+
+            udp_socket.sendto(send_packet.encode('utf-8'), address)
+            print(f"packet number {curr_status + i} was sent ")
+
+        second_time = time.time() - second_time
+        curr_ackn = curr_status
+        num_of_ack = curr_status + N - 1
+
+        # we check if we got acknowledge for every packet we send
+        while curr_ackn < num_of_ack:
+
+            third_time = time.time()
             try:
-                ACK, addresst = UDP_sock.recvfrom(200)
+                ACK, address = udp_socket.recvfrom(1024)
             except:
-                print("no message incoming")
+                print("No message was entered")
                 continue
-            # another that the last parcel of the file was delivered
-            if ACK.decode('utf-8') == "FIN":
-                print("FIN")
-                break
-            # if we get the ack of the good packet
-            elif ACK.decode('utf-8') == str(curr_ACK):
-                curr_ACK += 1
-                print(f"packet number {curr_ACK - 1} was received by the client ")
-            # if we get an unwanted packet or the timeout passed
-            elif ((int(ACK.decode('utf-8')) > curr_ACK) or (time.time() - start_time) > max_time):
+            # to much acknowledge or time to send the pkt was too long than expected
+            # so we lost a packet
+            if ((int(ACK.decode('utf-8')) > curr_ackn) or (time.time() - third_time) > second_time):
                 packet_lost += 1
-                last_ack = curr_ACK
-                # resend the rest of the window that wasn't already received by the client
-                for i in range(curr_ACK, curr_state + N):
-                    curr_packet = total_data[(curr_ACK + i) * PKT_SIZE: (curr_ACK + i) * PKT_SIZE + PKT_SIZE]
+                for i in range(curr_ackn, curr_status + N):
+                    curr_packet = total_data[(curr_ackn + i) * pakt_size: (curr_ackn + i) * pakt_size + pakt_size]
                     packet_data = curr_packet
-                    packet_length = len(curr_packet)
-                    packet_sq_n = curr_ACK + i
-                    packet_to_send = f"{str(packet_sq_n)}~{str(len(total_data))}~{str(packet_length)}~{packet_data}"
-                    print(packet_to_send.encode())
-                    UDP_sock.sendto(packet_to_send.encode('utf-8'), address)
-                    print(f"packet number {curr_ACK + i} was re-sent ")
-        curr_state = curr_ACK
+                    packet_size = len(curr_packet)
+                    sequence_num = curr_ackn + i
+                    send_packet = f"{str(sequence_num)}~{str(len(total_data))}~{str(packet_size)}~{packet_data}"
+                    udp_socket.sendto(send_packet.encode('utf-8'), address)
+                    print("packet number", curr_ackn + i, " was re-sent ")
 
-    print(
-        f"summary :\n \t packet loss : {packet_lost} \n \t total of packet sent : {counter_packet} \n \t length of original packet/500 : {len(total_data) / PKT_SIZE} \n \t time elapsed : {str(time.time() - start)} seconds ")
-    UDP_sock.close()
+
+            # the packets of the window size have been shipped
+            elif ACK.decode('utf-8') == str(curr_ackn):
+                curr_ackn += 1
+                print("packet number", curr_ackn - 1, "was received by the client ")
+
+            # all the packet have been shipped
+            elif ACK.decode('utf-8') == "FIN":
+                print("send all  message ---->  FIN")
+                break
+        curr_status = curr_ackn
+    print("------------------------------------------------------------------------------------------")
+    print("send packet  ---> ", packet_counter)
+    print("packet lost  --->", packet_lost)
+    print("time --->", (time.time() - start_time))
+
+    print("------------- SOCKET IS CLOSE ------------------")
+
+    udp_socket.close()
 
 
 """
