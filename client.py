@@ -11,7 +11,7 @@ from tkinter.ttk import Progressbar
 from turtle import left
 
 PORT = 50011
-PKT_SIZE = 500
+packet_size = 500
 HOST = '127.0.0.1'
 
 
@@ -237,6 +237,7 @@ class Client:
                 packet_data = get_data[3]
                 more_left = 0
 
+                # Have the right packages to start writing
                 if int(seq_num) == counter:
                     counter += 1
 
@@ -258,13 +259,13 @@ class Client:
                     UDP_socket.sendto(ACK, server)
 
 
-                # wrong packet
+                # Wrong packet
                 else:
                     num_of_packet = str(counter).encode('utf-8')
                     UDP_socket.sendto(num_of_packet, server)
                     continue
 
-                if packet_len < PKT_SIZE:
+                if packet_len < packet_size:
                     print("------FIN----------")
                     fin = "FIN".encode('utf-8')
                     UDP_socket.sendto(fin, server)
