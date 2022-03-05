@@ -10,10 +10,8 @@ from tkinter import LEFT, simpledialog, HORIZONTAL
 from tkinter.ttk import Progressbar
 from turtle import left
 
-PORT = 50011  ## need to random
-STATE = 0
-PORT_UDP = 50012
-PKT_SIZE = 500
+PORT = 50011
+packet_size = 500
 HOST = '127.0.0.1'
 
 
@@ -53,11 +51,10 @@ class Client:
         gui_thread.start()
         receive_thread.start()
 
-
-
     """ 
     create chat window (buttons,  text area..)
     """
+
     def gui_loop(self):
 
         self.win = tkinter.Tk()
@@ -143,19 +140,19 @@ class Client:
         self.win.protocol("WM_DELETE_WINDOW", self.stop)
         self.win.mainloop()
 
-
     """
     The writing function
     runs in an endless loop which is always waiting for an 
     input from the user. Once it gets some, it combines it with the nickname and sends it to the server. 
     """
+
     def write(self):
         message = f"-#everyone {self.nickname}: {self.input_area.get('1.0', 'end')}"
         self.sock.send(message.encode('utf-8'))
         self.input_area.delete('1.0', 'end')
 
-
     """A request list from the server of all connected"""
+
     def list(self):
         message = "-#list"
         self.sock.send(message.encode('utf-8'))
@@ -167,7 +164,9 @@ class Client:
             self.sock.send(message.encode('utf-8'))
 
         self.input_area.delete('1.0', 'end')
+
     """ A request list from the server of all the server files """
+
     def server_files(self):
         message = "you bitch!!"
         self.sock.send(message.encode('utf-8'))
@@ -179,7 +178,7 @@ class Client:
 
         file = self.input_download_area.get('1.0', 'end')
         print(file + "----------")
-        udp_sock = threading.Thread(target=self.handle_down, args=(file,))
+        udp_sock = threading.Thread(target=self.download_over_reliable_udp, args=(file,))
         udp_sock.start()
         self.input_download_area.delete('1.0', 'end')
 
@@ -189,94 +188,110 @@ class Client:
         self.sock.close()
         exit(0)
 
-    ##todo change stuff and add our explosion
-    def handle_down(self, filename):
+    global state
+    global UDP_port
+    """
+    in this function the client download the file from the server over reliable udp
+    reliable udp - GO - BACK - N   
+    """
+    def download_over_reliable_udp(self, file_name):
         self.progress_bar['value'] = 0
-        # at the begining of the download reset to play mode
-        global STATE
-        global PORT_UDP
+
+        UDP_port = 50012
         STATE = 1
 
         UDP_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        filename = filename.replace("\n", "")
-        print(filename + "---------------\n")
-        # file_r = open("transferred_" + filename, 'w+')
-        with open("transferred_" + filename, 'w') as file_r:
-            packet_counter = 0
-            accumulated_length = 0
-            UDP_socket.bind((HOST, PORT_UDP))
+        file_name = file_name.replace("\n", "")
+
+        with open("file_after_download_" + file_name, 'w') as file:
+            counter = 0
+
+            UDP_socket.bind((HOST, UDP_port))
+
             while True:
-                print("waiting for reception ...")
+
                 # if the pause button was pushed
+                # 0 = pause , 1 = continue
                 while STATE % 2 == 0:
                     sleep(1)
-                # if the stop button was pushed
 
+                # if the stop button was pushed
                 if STATE == 2:
                     break
                 try:
-                    data, server = UDP_socket.recvfrom(2048)
+                    (data, server) = UDP_socket.recvfrom(1024)
                     data = data.decode('utf-8')
-                    print("data--------------------------------------------------> ", data)
-                except:
-                    print("connection doesn't succeed -> try again ")
+
+                except Exception:
+                    print("Error ! ")
                     continue
 
-                # data = data.decode('utf-8')
-                splited_data = data.split('~')
-                print(splited_data)
-                total_length = int(splited_data[1])
-                sequence_data = splited_data[0]
-                print(f"packet number {sequence_data} was received  ")
-                if int(sequence_data) == packet_counter:
-                    packet_counter += 1
-                    new_data_part = splited_data[3]
-                    file_r.write(new_data_part)
-                    accumulated_length += int(splited_data[2])
-                    print(f"{(accumulated_length / total_length) * 100}% completed ")
-                    self.progress_bar['value'] += (int(splited_data[2]) * 100 / (total_length))
-                    print(f"part {sequence_data} was added to the file ")
-                    ACK = sequence_data
-                    UDP_socket.sendto(str(ACK).encode('utf-8'), server)
+                get_data = data.split('#')
+
+                seq_num = get_data[0]
+                file_size = int(get_data[1])
+                packet_len = int(get_data[2])
+                packet_data = get_data[3]
+                more_left = 0
+
+                # Have the right packages to start writing
+                if int(seq_num) == counter:
+                    counter += 1
+
+                    # write  the packet data to the new file
+                    file.write(packet_data)
+
+                    more_left += packet_len
+
+                    #  percentage of the download
+                    percentage_left = (more_left / file_size) * 100
+                    print(percentage_left, " %")
+
+                    progress_val = (packet_len * 100) / file_size
+
+                    self.progress_bar['value'] += progress_val
+
+                    ack = seq_num
+                    ACK = str(ack).encode('utf-8')
+                    UDP_socket.sendto(ACK, server)
+
+
+                # Wrong packet
                 else:
-                    print("wrong packet ! return request ")
-                    UDP_socket.sendto(str(packet_counter).encode('utf-8'), server)
+                    num_of_packet = str(counter).encode('utf-8')
+                    UDP_socket.sendto(num_of_packet, server)
                     continue
-                print(splited_data[2] + "--------------------")
-                if int(splited_data[2]) < PKT_SIZE:
-                    print("here")
-                    UDP_socket.sendto("FIN".encode('utf-8'), server)
+
+                if packet_len < packet_size:
+                    print("------FIN----------")
+                    fin = "FIN".encode('utf-8')
+                    UDP_socket.sendto(fin, server)
                     break
 
-            print("end of transfert -> closing socket ...")
-            file_re = file_r.read()
-            bytearr = bytearray(file_re, "utf8")
-        # file_r.close()
+            print("------ Download complete --------- ")
+
         UDP_socket.close()
-        print("closeeeeeeeee")
-        self.text_area.config(state='normal')
-        self.text_area.insert('end', f"the last byte is {bytearr[-1:]}\n")
-        self.text_area.yview('end')
-        self.text_area.config(state='disabled')
+        print("\n")
+        print(" -------Closing the socket -----")
 
     """pause and continue download"""
 
     def pause_down(self):
-        global STATE
-        STATE += 1
+        global state
+        state += 1
 
     """stop the download and close the udp socket"""
 
     def stop_down(self):
-        global STATE
-        STATE = 2
-
+        global state
+        state = 2
 
     """"
     in this function we constantly tries to receive messages and to print them onto the screen.
     
     :exception : In case there is some error, we close the connection and break the loop 
     """
+
     def recevie(self):
         while self.running:
             try:
