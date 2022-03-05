@@ -221,10 +221,7 @@ class Client:
                 try:
                     (data, server) = UDP_socket.recvfrom(1024)
                     data = data.decode('utf-8')
-                    print("--------------------------------data---------------------------------------------")
-                    print(data)
-                    print("--------------------------------data---------------------------------------------")
-
+                 
                 except Exception:
                     print("Error ! ")
                     continue
