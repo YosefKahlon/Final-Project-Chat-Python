@@ -31,13 +31,16 @@ try:
 except:
     HOST = "127.0.0.1"
     print(HOST)
+
+
+
 server.bind((HOST, PORT))
 server.listen()
 
 """ clients about to join the server"""
 clients = []
 nicknames = []
-server_files = ["barak.png", "yossi.txt", "gal.txt", "final.pdf"]
+server_files = ["ex.txt", "yossi.txt", "gal.txt", "final.pdf"]
 
 """ broacast: Send a message to all clients connected to the server """
 
@@ -179,8 +182,7 @@ def download(client, file_name):
             # Received the ACK message for the current package
             if message == str(curr_ack):
                 curr_ack += 1
-                ack_for_pk = curr_ack - 1
-                print('ack for packet num ---> ', ack_for_pk)
+
 
                 # all the packets arrived
             elif message == "FIN":
