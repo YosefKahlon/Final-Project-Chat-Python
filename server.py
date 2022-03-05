@@ -173,7 +173,7 @@ def download(client, file_name):
 
             start = time.time()
             try:
-                (ACK, addresst) = udp_socket.recvfrom(200)
+                (ACK, addresst) = udp_socket.recvfrom(1024)
             except:
                 continue
 
