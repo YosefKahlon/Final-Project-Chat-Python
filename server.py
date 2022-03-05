@@ -94,8 +94,20 @@ def show_server_files(index):
 
 
 """
- UDP SERVER 
- 
+ UDP SERVER using GO-BACK-N
+ in this method the server sends the necessary file for the client
+ Overly reliable - udp
+
+  about GO BACK N : 
+  sliding window protocol , 
+  the sender send multi of packet before the receiver send him back the acknowledge .
+  if the sender does not receive ACK  at the right time, all the 
+  packets will be send again .
+
+
+ :param : client on the server   
+ :param : file the client ask 
+ :exception : error with file  
  """
 
 
