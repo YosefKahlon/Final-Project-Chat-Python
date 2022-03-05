@@ -17,7 +17,7 @@ import threading
 # connection data
 PORT = 50011
 PKT_SIZE = 500
-PORT_UDP = 50012
+UDP_port = 50012
 
 try:
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP SOCKET
@@ -106,7 +106,7 @@ def download(client, file_name):
     print("UDP socket starting...")
     counter_packet = 0
     packet_lost = 0
-    address = (client.getsockname()[0], PORT_UDP)
+    address = (client.getsockname()[0], UDP_port)
     start = time.time()
     packet_sq_n = 0
     packet_data = 0
@@ -141,7 +141,7 @@ def download(client, file_name):
             packet_data = curr_packet
             packet_length = len(curr_packet)
             packet_sq_n = curr_state + i
-            packet_to_send = f"{str(packet_sq_n)}~{str(len(total_data))}~{str(packet_length)}~{packet_data}"
+            packet_to_send = f"{str(packet_sq_n)}#{str(len(total_data))}#{str(packet_length)}#{packet_data}"
             print(packet_to_send)
 
             UDP_sock.sendto(packet_to_send.encode('utf-8'), address)
@@ -175,7 +175,7 @@ def download(client, file_name):
                     packet_data = curr_packet
                     packet_length = len(curr_packet)
                     packet_sq_n = curr_ACK + i
-                    packet_to_send = f"{str(packet_sq_n)}~{str(len(total_data))}~{str(packet_length)}~{packet_data}"
+                    packet_to_send = f"{str(packet_sq_n)}#{str(len(total_data))}#{str(packet_length)}#{packet_data}"
                     print(packet_to_send.encode())
                     UDP_sock.sendto(packet_to_send.encode('utf-8'), address)
                     print(f"packet number {curr_ACK + i} was re-sent ")
